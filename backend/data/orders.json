@@ -1,0 +1,36 @@
+[
+  {
+    "_id": "ord_1788338460130",
+    "orderId": 1002,
+    "customerName": "Vimalan",
+    "phone": "9876543210",
+    "orderType": "bulk",
+    "eventDate": "2026-09-25",
+    "eventTime": "13:00",
+    "guestCount": "150",
+    "dishes": "Mutton Biriyani, Chicken Fry, Egg Masala",
+    "items": [],
+    "totalAmount": 0,
+    "address": "Salem Main Rd, Komarapalayam",
+    "notes": "Spicy preparation",
+    "status": "confirmed",
+    "createdAt": "2026-09-02T08:41:00.130Z",
+    "updatedAt": "2026-09-02T08:41:22.355Z"
+  },
+  {
+    "_id": "mem_1",
+    "orderId": 1001,
+    "customerName": "Rajesh Kumar",
+    "phone": "9876543210",
+    "orderType": "bulk",
+    "eventDate": "2024-09-15",
+    "eventTime": "18:00",
+    "guestCount": "100",
+    "dishes": "Biriyani Special, Noodles, Starters",
+    "address": "Salem Main Rd, Near TMMB Bank, Komarapalayam",
+    "status": "pending",
+    "totalAmount": 25000,
+    "createdAt": "2026-09-02T08:32:02.434Z",
+    "updatedAt": "2026-09-02T08:32:02.435Z"
+  }
+]

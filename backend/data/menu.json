@@ -1,0 +1,156 @@
+[
+  {
+    "_id": "menu_1",
+    "name": "Mutton Biriyani",
+    "category": "Biriyani",
+    "price": 280,
+    "description": "Aromatic basmati with tender mutton cooked to perfection",
+    "isAvailable": true,
+    "isPopular": true,
+    "dietaryType": "non-veg",
+    "imageEmoji": "🍛"
+  },
+  {
+    "_id": "menu_2",
+    "name": "Chicken Biriyani",
+    "category": "Biriyani",
+    "price": 240,
+    "description": "Fragrant rice with succulent spiced chicken and royal masala",
+    "isAvailable": true,
+    "isPopular": true,
+    "dietaryType": "non-veg",
+    "imageEmoji": "🍗"
+  },
+  {
+    "_id": "menu_3",
+    "name": "Kabab Biriyani",
+    "category": "Biriyani",
+    "price": 300,
+    "description": "Royal blend of biriyani with grilled seekh kababs",
+    "isAvailable": true,
+    "isPopular": false,
+    "dietaryType": "non-veg",
+    "imageEmoji": "🍢"
+  },
+  {
+    "_id": "menu_4",
+    "name": "Kushka",
+    "category": "Biriyani",
+    "price": 250,
+    "description": "Premium biriyani special preparation with rich flavors",
+    "isAvailable": true,
+    "isPopular": false,
+    "dietaryType": "non-veg",
+    "imageEmoji": "🍚"
+  },
+  {
+    "_id": "menu_5",
+    "name": "Chicken Rice",
+    "category": "Fast Food & Noodles",
+    "price": 150,
+    "description": "Flavored wok-fried rice with tender chicken cubes",
+    "isAvailable": true,
+    "isPopular": true,
+    "dietaryType": "non-veg",
+    "imageEmoji": "🥡"
+  },
+  {
+    "_id": "menu_6",
+    "name": "Egg Rice",
+    "category": "Fast Food & Noodles",
+    "price": 120,
+    "description": "Classic fried rice with seasoned scrambled eggs",
+    "isAvailable": true,
+    "isPopular": false,
+    "dietaryType": "egg",
+    "imageEmoji": "🍳"
+  },
+  {
+    "_id": "menu_7",
+    "name": "Chicken Noodles",
+    "category": "Fast Food & Noodles",
+    "price": 140,
+    "description": "Stir-fried noodles with chicken and fresh crunchy vegetables",
+    "isAvailable": true,
+    "isPopular": true,
+    "dietaryType": "non-veg",
+    "imageEmoji": "🍜"
+  },
+  {
+    "_id": "menu_8",
+    "name": "Egg Noodles",
+    "category": "Fast Food & Noodles",
+    "price": 110,
+    "description": "Crispy tossed noodles with scrambled egg",
+    "isAvailable": true,
+    "isPopular": false,
+    "dietaryType": "egg",
+    "imageEmoji": "🥢"
+  },
+  {
+    "_id": "menu_9",
+    "name": "Chicken Fry",
+    "category": "Starters & Gravy",
+    "price": 180,
+    "description": "Crispy and spicy South Indian fried chicken pieces",
+    "isAvailable": true,
+    "isPopular": true,
+    "dietaryType": "non-veg",
+    "imageEmoji": "🍗"
+  },
+  {
+    "_id": "menu_10",
+    "name": "Chicken Leg Piece",
+    "category": "Starters & Gravy",
+    "price": 160,
+    "description": "Tender, juicy marinated chicken leg fry",
+    "isAvailable": true,
+    "isPopular": true,
+    "dietaryType": "non-veg",
+    "imageEmoji": "🍖"
+  },
+  {
+    "_id": "menu_11",
+    "name": "Liver Fry",
+    "category": "Starters & Gravy",
+    "price": 150,
+    "description": "Crispy liver delicacy with ground pepper masala",
+    "isAvailable": true,
+    "isPopular": false,
+    "dietaryType": "non-veg",
+    "imageEmoji": "🍲"
+  },
+  {
+    "_id": "menu_12",
+    "name": "Kadai Fry",
+    "category": "Starters & Gravy",
+    "price": 200,
+    "description": "Restaurant specialty kadai chicken fry with capsicum",
+    "isAvailable": true,
+    "isPopular": false,
+    "dietaryType": "non-veg",
+    "imageEmoji": "🥘"
+  },
+  {
+    "_id": "menu_13",
+    "name": "Egg Masala",
+    "category": "Starters & Gravy",
+    "price": 140,
+    "description": "Boiled eggs simmered in rich spiced onion-tomato gravy",
+    "isAvailable": true,
+    "isPopular": false,
+    "dietaryType": "egg",
+    "imageEmoji": "🥚"
+  },
+  {
+    "_id": "menu_14",
+    "name": "Chicken Masala",
+    "category": "Starters & Gravy",
+    "price": 220,
+    "description": "Tender chicken pieces cooked in thick aromatic royal gravy",
+    "isAvailable": true,
+    "isPopular": true,
+    "dietaryType": "non-veg",
+    "imageEmoji": "🍲"
+  }
+]
