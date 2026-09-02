@@ -9,11 +9,12 @@ import ContactSection from '../components/ContactSection';
 import CartDrawer from '../components/CartDrawer';
 import OrderTrackingModal from '../components/OrderTrackingModal';
 import FloatingWhatsApp from '../components/FloatingWhatsApp';
+import BottomMobileNav from '../components/BottomMobileNav';
 import AuthModal from '../components/AuthModal';
 import UserProfileModal from '../components/UserProfileModal';
 import { authApi } from '../lib/api';
 import Link from 'next/link';
-import { Heart, Sparkles, Phone, MapPin, ShieldCheck, Utensils } from 'lucide-react';
+import { Flame, Sparkles, Phone, MapPin, ShieldCheck, Utensils, PartyPopper, Truck, CheckCircle2, Clock } from 'lucide-react';
 
 export default function HomePage() {
   const [cart, setCart] = useState([]);
@@ -103,7 +104,7 @@ export default function HomePage() {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1">
+      <main className="flex-1 pb-16 md:pb-0">
         {/* Hero Section */}
         <HeroSection
           onOpenBulk={() => scrollToSection('bulk')}
@@ -124,27 +125,27 @@ export default function HomePage() {
         />
 
         {/* Services & Features Section */}
-        <section id="services" className="py-20 bg-white border-b border-gray-200">
+        <section id="services" className="py-14 sm:py-20 bg-white border-b border-gray-200">
           <div className="max-w-6xl mx-auto px-4">
-            <div className="text-center max-w-2xl mx-auto mb-16">
+            <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-16">
               <span className="text-xs font-bold text-royal-crimson uppercase tracking-wider bg-red-50 px-3 py-1 rounded-full border border-red-200">
                 Why Royal Biriyani
               </span>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-royal-crimson mt-2 tracking-tight">
+              <h2 className="text-2xl sm:text-4xl font-black text-royal-crimson mt-2 tracking-tight">
                 Crafted With Heritage &amp; Passion
               </h2>
-              <p className="text-gray-600 mt-2 text-sm sm:text-base">
+              <p className="text-gray-600 mt-2 text-xs sm:text-base">
                 Discover why food lovers and families across Komarapalayam choose Royal Biriyani.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
               {/* Feature 1 */}
-              <div className="p-8 rounded-3xl bg-gray-50 border border-gray-200 hover:border-royal-gold transition hover:shadow-xl group">
-                <div className="w-14 h-14 rounded-2xl bg-red-100 text-royal-crimson flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition">
-                  🥘
+              <div className="p-6 sm:p-8 rounded-3xl bg-gray-50 border border-gray-200 hover:border-amber-300 transition hover:shadow-xl group">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-red-100 text-royal-crimson flex items-center justify-center mb-5 group-hover:scale-110 transition shadow-xs">
+                  <Flame className="w-6 h-6 sm:w-7 sm:h-7 text-royal-crimson" />
                 </div>
-                <h3 className="text-xl font-extrabold text-gray-900 mb-2">
+                <h3 className="text-lg sm:text-xl font-extrabold text-gray-900 mb-2">
                   Wood-Fired Dum Cooking
                 </h3>
                 <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
@@ -153,11 +154,11 @@ export default function HomePage() {
               </div>
 
               {/* Feature 2 */}
-              <div className="p-8 rounded-3xl bg-gray-50 border border-gray-200 hover:border-royal-gold transition hover:shadow-xl group">
-                <div className="w-14 h-14 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition">
-                  🎉
+              <div className="p-6 sm:p-8 rounded-3xl bg-gray-50 border border-gray-200 hover:border-amber-300 transition hover:shadow-xl group">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-amber-100 text-amber-800 flex items-center justify-center mb-5 group-hover:scale-110 transition shadow-xs">
+                  <PartyPopper className="w-6 h-6 sm:w-7 sm:h-7 text-amber-700" />
                 </div>
-                <h3 className="text-xl font-extrabold text-gray-900 mb-2">
+                <h3 className="text-lg sm:text-xl font-extrabold text-gray-900 mb-2">
                   Grand Bulk Catering
                 </h3>
                 <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
@@ -166,12 +167,12 @@ export default function HomePage() {
               </div>
 
               {/* Feature 3 */}
-              <div className="p-8 rounded-3xl bg-gray-50 border border-gray-200 hover:border-royal-gold transition hover:shadow-xl group">
-                <div className="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition">
-                  🛵
+              <div className="p-6 sm:p-8 rounded-3xl bg-gray-50 border border-gray-200 hover:border-amber-300 transition hover:shadow-xl group">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center mb-5 group-hover:scale-110 transition shadow-xs">
+                  <Truck className="w-6 h-6 sm:w-7 sm:h-7 text-emerald-700" />
                 </div>
-                <h3 className="text-xl font-extrabold text-gray-900 mb-2">
-                  Fast Home Delivery
+                <h3 className="text-lg sm:text-xl font-extrabold text-gray-900 mb-2">
+                  Fast Doorstep Delivery
                 </h3>
                 <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
                   Enjoy hot, steaming biriyani and fast food right at your doorstep in Komarapalayam with convenient WhatsApp order tracking.
@@ -186,28 +187,28 @@ export default function HomePage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-royal-charcoal text-white pt-16 pb-8 border-t-4 border-royal-gold">
-        <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-gray-800">
+      <footer className="bg-royal-charcoal text-white pt-14 pb-12 sm:pb-8 border-t-4 border-royal-gold">
+        <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 pb-10 border-b border-gray-800">
           
           {/* Col 1 */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-royal-crimson flex items-center justify-center text-white text-xl">
-                🍛
+          <div className="space-y-3">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-royal-crimson flex items-center justify-center text-royal-gold shadow">
+                <Utensils className="w-5 h-5" />
               </div>
-              <span className="font-extrabold text-xl text-white">Royal Biriyani</span>
+              <span className="font-extrabold text-lg text-white">Royal Biriyani</span>
             </div>
             <p className="text-xs text-gray-400 leading-relaxed">
               Taste the Royalty in Every Grain! Serving the finest South Indian Biriyani, Fast Food, and Bulk Feast Catering.
             </p>
-            <div className="text-xs text-amber-300 font-medium">
-              📍 Salem Main Rd, Komarapalayam
+            <div className="text-xs text-amber-300 font-medium flex items-center gap-1">
+              <MapPin className="w-3.5 h-3.5 text-royal-gold" /> Salem Main Rd, Komarapalayam
             </div>
           </div>
 
           {/* Col 2 */}
           <div className="space-y-3">
-            <h4 className="font-bold text-sm text-royal-gold uppercase tracking-wider">Quick Navigation</h4>
+            <h4 className="font-bold text-xs sm:text-sm text-royal-gold uppercase tracking-wider">Quick Navigation</h4>
             <ul className="text-xs space-y-2 text-gray-300">
               <li><button onClick={() => scrollToSection('menu')} className="hover:text-royal-gold transition">Our Royal Menu</button></li>
               <li><button onClick={() => scrollToSection('bulk')} className="hover:text-royal-gold transition">Bulk Event Booking</button></li>
@@ -219,20 +220,20 @@ export default function HomePage() {
 
           {/* Col 3 */}
           <div className="space-y-3">
-            <h4 className="font-bold text-sm text-royal-gold uppercase tracking-wider">Contact &amp; Timings</h4>
+            <h4 className="font-bold text-xs sm:text-sm text-royal-gold uppercase tracking-wider">Contact &amp; Timings</h4>
             <div className="text-xs space-y-2 text-gray-300">
-              <p>🍴 <strong>Restaurant:</strong> <a href="tel:+917418525405" className="hover:text-white">+91 74185 25405</a></p>
-              <p>📱 <strong>Admin WhatsApp:</strong> 6384945599</p>
-              <p>🕒 <strong>Hours:</strong> 11:00 AM – 11:00 PM (All Days)</p>
-              <p>📍 <strong>Location:</strong> Salem Main Rd, Near TMMB Bank, Komarapalayam 638183</p>
+              <p className="flex items-center gap-1.5"><Utensils className="w-3.5 h-3.5 text-royal-gold" /> <strong>Restaurant:</strong> <a href="tel:+917418525405" className="hover:text-white">+91 74185 25405</a></p>
+              <p className="flex items-center gap-1.5"><Phone className="w-3.5 h-3.5 text-emerald-400" /> <strong>Admin WhatsApp:</strong> 6384945599</p>
+              <p className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-amber-300" /> <strong>Hours:</strong> 11:00 AM – 11:00 PM</p>
+              <p className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 text-red-400" /> <strong>Location:</strong> Near TMMB Bank, Komarapalayam</p>
             </div>
           </div>
 
           {/* Col 4 */}
           <div className="space-y-3">
-            <h4 className="font-bold text-sm text-royal-gold uppercase tracking-wider">Admin &amp; Management</h4>
+            <h4 className="font-bold text-xs sm:text-sm text-royal-gold uppercase tracking-wider">Admin Portal</h4>
             <p className="text-xs text-gray-400 leading-relaxed">
-              Restaurant staff and managers can manage real-time orders and menu items via the admin portal.
+              Restaurant staff can manage live orders and menu inventory via the secure admin dashboard.
             </p>
             <Link
               href="/admin"
@@ -245,13 +246,20 @@ export default function HomePage() {
         </div>
 
         {/* Bottom copyright */}
-        <div className="max-w-6xl mx-auto px-4 pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-gray-500 gap-4">
+        <div className="max-w-6xl mx-auto px-4 pt-6 flex flex-col sm:flex-row items-center justify-between text-[11px] text-gray-500 gap-3">
           <p>© {new Date().getFullYear()} Royal Biriyani &amp; Fast Food. All Rights Reserved.</p>
           <p className="flex items-center gap-1 text-gray-400">
-            Built with Next.js, Node.js, Express &amp; MongoDB Atlas
+            Built with Next.js 14, Node.js, Express &amp; MongoDB Atlas
           </p>
         </div>
       </footer>
+
+      {/* Thumb-Friendly Floating Mobile Bottom Bar */}
+      <BottomMobileNav
+        cartCount={totalCartCount}
+        onOpenCart={() => setIsCartOpen(true)}
+        onOpenTrack={() => setIsTrackOpen(true)}
+      />
 
       {/* Cart Drawer */}
       <CartDrawer

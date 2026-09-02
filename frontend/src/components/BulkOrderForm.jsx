@@ -311,24 +311,24 @@ export default function BulkOrderForm({ onOrderSubmitted, currentUser = null }) 
                         <option value="">-- Choose Dishes or Catering Package --</option>
                         
                         {/* Curated Royal Packages */}
-                        <optgroup label="👑 Royal Catering Packages (Combos)">
+                        <optgroup label="Royal Catering Combo Packages">
                           <option value="Royal Feast Package (Mutton Biriyani + Chicken Fry + Egg Masala + Dessert)">
-                            👑 Royal Feast Package (Mutton Biriyani + Chicken Fry + Egg Masala + Dessert)
+                            Royal Feast Package (Mutton Biriyani + Chicken Fry + Egg Masala + Dessert)
                           </option>
                           <option value="Grand Chicken Biriyani Feast (Chicken Biriyani + Chicken Leg Piece + Royal Gravy)">
-                            🍗 Grand Chicken Biriyani Feast (Chicken Biriyani + Chicken Leg Piece + Royal Gravy)
+                            Grand Chicken Biriyani Feast (Chicken Biriyani + Chicken Leg Piece + Royal Gravy)
                           </option>
                           <option value="Fast Food Banquet (Chicken Rice + Chicken Noodles + Chicken Fry + Gravy)">
-                            🥡 Fast Food Banquet (Chicken Rice + Chicken Noodles + Chicken Fry + Gravy)
+                            Fast Food Banquet (Chicken Rice + Chicken Noodles + Chicken Fry + Gravy)
                           </option>
                           <option value="Grand All-in-One Feast (Mutton & Chicken Biriyani + Starters + Fast Food + Gravy)">
-                            ✨ Grand All-in-One Feast (Mutton &amp; Chicken Biriyani + Starters + Gravy)
+                            Grand All-in-One Feast (Mutton &amp; Chicken Biriyani + Starters + Gravy)
                           </option>
                         </optgroup>
 
                         {/* Dynamic Categorized Food Menu Items */}
                         {Object.entries(groupedMenu).map(([category, items]) => (
-                          <optgroup key={category} label={`🍽️ ${category}`}>
+                          <optgroup key={category} label={category}>
                             {items.map(item => (
                               <option 
                                 key={item._id || item.name} 

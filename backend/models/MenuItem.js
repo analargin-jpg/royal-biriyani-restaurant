@@ -3,22 +3,26 @@ const mongoose = require('mongoose');
 const MenuItemSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, 'Dish name is required'],
+    required: [true, 'Please provide dish name'],
     trim: true
   },
   category: {
     type: String,
-    required: [true, 'Category is required'],
-    enum: ['Biriyani', 'Fast Food & Noodles', 'Starters & Gravy', 'Beverages & Desserts', 'Specials'],
+    required: [true, 'Please specify category'],
+    enum: ['Biriyani', 'Fast Food & Noodles', 'Starters & Gravy', 'Desserts & Beverages', 'Specials'],
     default: 'Biriyani'
   },
   price: {
     type: Number,
-    required: [true, 'Price is required']
+    required: [true, 'Please specify price in INR'],
+    min: 0
   },
   description: {
     type: String,
-    trim: true,
+    default: ''
+  },
+  imageUrl: {
+    type: String,
     default: ''
   },
   isAvailable: {
@@ -33,14 +37,6 @@ const MenuItemSchema = new mongoose.Schema({
     type: String,
     enum: ['non-veg', 'veg', 'egg'],
     default: 'non-veg'
-  },
-  imageEmoji: {
-    type: String,
-    default: '🍛'
-  },
-  imageUrl: {
-    type: String,
-    default: ''
   }
 }, {
   timestamps: true

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { X, ShoppingBag, Plus, Minus, Trash2, Send, CheckCircle2, Phone, MapPin, User, FileText, Sparkles, RefreshCw, MessageCircle } from 'lucide-react';
+import { X, ShoppingBag, Plus, Minus, Trash2, Send, CheckCircle2, Phone, MapPin, User, FileText, Sparkles, RefreshCw, MessageCircle, Truck } from 'lucide-react';
 import { orderApi } from '../lib/api';
 
 export default function CartDrawer({ 
@@ -332,24 +332,24 @@ export default function CartDrawer({
                     <button
                       type="button"
                       onClick={() => setOrderType('regular_delivery')}
-                      className={`flex-1 py-2 rounded-lg text-xs font-bold border transition ${
+                      className={`flex-1 py-2.5 rounded-xl text-xs font-bold border transition flex items-center justify-center gap-1.5 ${
                         orderType === 'regular_delivery'
-                          ? 'bg-royal-crimson text-white border-royal-crimson'
+                          ? 'bg-royal-crimson text-white border-royal-crimson shadow-xs'
                           : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
                       }`}
                     >
-                      🛵 Home Delivery
+                      <Truck className="w-3.5 h-3.5" /> Home Delivery
                     </button>
                     <button
                       type="button"
                       onClick={() => setOrderType('takeaway')}
-                      className={`flex-1 py-2 rounded-lg text-xs font-bold border transition ${
+                      className={`flex-1 py-2.5 rounded-xl text-xs font-bold border transition flex items-center justify-center gap-1.5 ${
                         orderType === 'takeaway'
-                          ? 'bg-royal-crimson text-white border-royal-crimson'
+                          ? 'bg-royal-crimson text-white border-royal-crimson shadow-xs'
                           : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
                       }`}
                     >
-                      🥡 Self Pickup
+                      <ShoppingBag className="w-3.5 h-3.5" /> Self Pickup
                     </button>
                   </div>
 

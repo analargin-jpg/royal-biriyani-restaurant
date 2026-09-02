@@ -1,155 +1,160 @@
-const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '../.env') });
 const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+const path = require('path');
+const bcrypt = require('bcryptjs');
+
+dotenv.config({ path: path.join(__dirname, '../.env') });
+
 const MenuItem = require('../models/MenuItem');
 const Order = require('../models/Order');
 const Admin = require('../models/Admin');
+const User = require('../models/User');
 
-const menuItemsData = [
-  // Biriyani
+const menuItems = [
+  // 1. Biriyani Special
   {
     name: 'Mutton Biriyani',
     category: 'Biriyani',
     price: 280,
-    description: 'Aromatic long-grain basmati rice slow-cooked with tender succulent mutton & authentic spices',
+    description: 'Aromatic basmati rice layered with succulent tender mutton chunks, slow dum cooked in traditional copper handis.',
+    imageUrl: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?q=80&w=800&auto=format&fit=crop',
     isAvailable: true,
     isPopular: true,
-    dietaryType: 'non-veg',
-    imageEmoji: '🍛'
+    dietaryType: 'non-veg'
   },
   {
     name: 'Chicken Biriyani',
     category: 'Biriyani',
     price: 240,
-    description: 'Fragrant biriyani rice infused with saffron, caramelized onions, and juicy spiced chicken pieces',
+    description: 'Fragrant seeraga samba/basmati rice cooked with marinated bone-in chicken, infused with saffron, ghee, and royal spices.',
+    imageUrl: 'https://images.unsplash.com/photo-1589302168068-964664d93dc0?q=80&w=800&auto=format&fit=crop',
     isAvailable: true,
     isPopular: true,
-    dietaryType: 'non-veg',
-    imageEmoji: '🍗'
+    dietaryType: 'non-veg'
   },
   {
     name: 'Kabab Biriyani',
     category: 'Biriyani',
     price: 300,
-    description: 'A royal grand combination of dum biriyani served with freshly grilled, tender seekh kababs',
+    description: 'Royal blend of slow-cooked dum biriyani served with grilled, juicy spiced seekh chicken kababs.',
+    imageUrl: 'https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?q=80&w=800&auto=format&fit=crop',
     isAvailable: true,
     isPopular: false,
-    dietaryType: 'non-veg',
-    imageEmoji: '🍢'
+    dietaryType: 'non-veg'
   },
   {
     name: 'Kushka',
     category: 'Biriyani',
     price: 250,
-    description: 'Flavorful spiced biriyani rice cooked in rich meat broth, served with raita and brinjal gravy',
+    description: 'Rich, flavorful spiced plain dum biriyani rice served with royal onion raita and thick dalcha gravy.',
+    imageUrl: 'https://images.unsplash.com/photo-1633945274405-b6c8069047b0?q=80&w=800&auto=format&fit=crop',
     isAvailable: true,
     isPopular: false,
-    dietaryType: 'non-veg',
-    imageEmoji: '🍚'
+    dietaryType: 'non-veg'
   },
 
-  // Fast Food & Noodles
+  // 2. Fast Food & Noodles
   {
     name: 'Chicken Rice',
     category: 'Fast Food & Noodles',
     price: 150,
-    description: 'Wok-tossed aromatic rice with seasoned chicken cubes, spring onions, and special sauces',
+    description: 'Wok-tossed Indo-Chinese fragrant basmati rice tossed with spiced tender chicken cubes and crisp vegetables.',
+    imageUrl: 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?q=80&w=800&auto=format&fit=crop',
     isAvailable: true,
     isPopular: true,
-    dietaryType: 'non-veg',
-    imageEmoji: '🥡'
+    dietaryType: 'non-veg'
   },
   {
     name: 'Egg Rice',
     category: 'Fast Food & Noodles',
     price: 120,
-    description: 'Classic wok fried rice tossed with seasoned fluffy scrambled eggs and crisp vegetables',
+    description: 'Classic wok-fried rice with freshly scrambled eggs, crushed black pepper, and chopped scallions.',
+    imageUrl: 'https://images.unsplash.com/photo-1512058564366-18510be2db19?q=80&w=800&auto=format&fit=crop',
     isAvailable: true,
     isPopular: false,
-    dietaryType: 'egg',
-    imageEmoji: '🍳'
+    dietaryType: 'egg'
   },
   {
     name: 'Chicken Noodles',
     category: 'Fast Food & Noodles',
     price: 140,
-    description: 'Hot wok-fried hakka noodles with shredded tender chicken, peppers, and savory spices',
+    description: 'Sizzling hakka noodles stir-fried with shredded chicken, crunchy bell peppers, and savory soy garlic sauce.',
+    imageUrl: 'https://images.unsplash.com/photo-1585032226651-759b368d7246?q=80&w=800&auto=format&fit=crop',
     isAvailable: true,
     isPopular: true,
-    dietaryType: 'non-veg',
-    imageEmoji: '🍜'
+    dietaryType: 'non-veg'
   },
   {
     name: 'Egg Noodles',
     category: 'Fast Food & Noodles',
     price: 110,
-    description: 'Tossed noodles with scrambled eggs, fresh cabbage, carrots, and house seasoning',
+    description: 'Crisp stir-fried noodles with scrambled egg, shredded cabbage, carrots, and house chili seasoning.',
+    imageUrl: 'https://images.unsplash.com/photo-1612927601601-6638404737ce?q=80&w=800&auto=format&fit=crop',
     isAvailable: true,
     isPopular: false,
-    dietaryType: 'egg',
-    imageEmoji: '🥢'
+    dietaryType: 'egg'
   },
 
-  // Starters & Gravy
+  // 3. Starters & Gravy
   {
     name: 'Chicken Fry',
     category: 'Starters & Gravy',
     price: 180,
-    description: 'Crispy, deep-fried chicken marinated in South Indian spices, curry leaves, and green chillies',
+    description: 'Crispy, deep-fried South Indian spiced chicken 65 pieces garnished with fried curry leaves and lemon.',
+    imageUrl: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?q=80&w=800&auto=format&fit=crop',
     isAvailable: true,
     isPopular: true,
-    dietaryType: 'non-veg',
-    imageEmoji: '🍗'
+    dietaryType: 'non-veg'
   },
   {
     name: 'Chicken Leg Piece',
     category: 'Starters & Gravy',
     price: 160,
-    description: 'Juicy whole chicken drumstick coated in secret masala and roasted to perfection',
+    description: 'Juicy, succulent whole chicken drumstick marinated in yogurt and tandoori spices, flame-roasted to perfection.',
+    imageUrl: 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?q=80&w=800&auto=format&fit=crop',
     isAvailable: true,
     isPopular: true,
-    dietaryType: 'non-veg',
-    imageEmoji: '🍖'
+    dietaryType: 'non-veg'
   },
   {
     name: 'Liver Fry',
     category: 'Starters & Gravy',
     price: 150,
-    description: 'Pan-fried mutton/chicken liver tossed in coarse black pepper and caramelized shallots',
+    description: 'Authentic Chettinad style chicken liver sauteed with freshly ground black pepper and shallots.',
+    imageUrl: 'https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?q=80&w=800&auto=format&fit=crop',
     isAvailable: true,
     isPopular: false,
-    dietaryType: 'non-veg',
-    imageEmoji: '🍲'
+    dietaryType: 'non-veg'
   },
   {
     name: 'Kadai Fry',
     category: 'Starters & Gravy',
     price: 200,
-    description: 'Chef special dry fry preparation cooked in iron kadai with bell peppers and roasted coriander',
+    description: 'Spicy wok-tossed kadai chicken cooked with crushed coriander seeds, capsicum, and thick onion masala.',
+    imageUrl: 'https://images.unsplash.com/photo-1606471191009-63994c53433b?q=80&w=800&auto=format&fit=crop',
     isAvailable: true,
     isPopular: false,
-    dietaryType: 'non-veg',
-    imageEmoji: '🥘'
+    dietaryType: 'non-veg'
   },
   {
     name: 'Egg Masala',
     category: 'Starters & Gravy',
     price: 140,
-    description: 'Hard-boiled eggs simmered in a rich tomato, onion, and roasted coconut gravy',
+    description: 'Hard-boiled eggs simmered in a rich, velvety onion-tomato masala gravy with ground cinnamon and cloves.',
+    imageUrl: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=800&auto=format&fit=crop',
     isAvailable: true,
     isPopular: false,
-    dietaryType: 'egg',
-    imageEmoji: '🥚'
+    dietaryType: 'egg'
   },
   {
     name: 'Chicken Masala',
     category: 'Starters & Gravy',
     price: 220,
-    description: 'Tender chicken pieces cooked in a thick aromatic Chettinad-style royal gravy',
+    description: 'Tender chicken pieces simmered in an aromatic South Indian homestyle thick gravy.',
+    imageUrl: 'https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?q=80&w=800&auto=format&fit=crop',
     isAvailable: true,
     isPopular: true,
-    dietaryType: 'non-veg',
-    imageEmoji: '🍲'
+    dietaryType: 'non-veg'
   }
 ];
 
@@ -159,82 +164,86 @@ const sampleOrders = [
     customerName: 'Rajesh Kumar',
     phone: '9876543210',
     orderType: 'bulk',
-    eventDate: '2024-09-15',
+    eventDate: '2026-09-15',
     eventTime: '18:00',
     guestCount: '100',
-    dishes: 'Mutton Biriyani, Chicken Fry, Chicken Noodles',
+    dishes: 'Mutton Biriyani, Chicken Fry, Egg Masala',
     address: 'Salem Main Rd, Near TMMB Bank, Komarapalayam',
     status: 'pending',
-    totalAmount: 28000,
-    notes: 'Wedding reception dinner'
+    totalAmount: 28000
   },
   {
     orderId: 1002,
     customerName: 'Suresh Raina',
     phone: '9845123456',
-    orderType: 'bulk',
-    eventDate: '2024-09-20',
-    eventTime: '12:30',
-    guestCount: '250',
-    dishes: 'Chicken Biriyani, Egg Masala, Chicken Leg Piece',
-    address: 'JKK Nattraja Nagar, Komarapalayam, Tamil Nadu',
+    orderType: 'regular_delivery',
+    eventDate: '2026-09-02',
+    eventTime: '13:00',
+    dishes: 'Chicken Biriyani (x2), Chicken Leg Piece (x1)',
+    items: [
+      { name: 'Chicken Biriyani', price: 240, quantity: 2, subtotal: 480 },
+      { name: 'Chicken Leg Piece', price: 160, quantity: 1, subtotal: 160 }
+    ],
+    address: 'JKK Nattraja Nagar, Komarapalayam',
     status: 'confirmed',
-    totalAmount: 60000,
-    notes: 'Birthday celebration'
+    totalAmount: 640
   },
   {
     orderId: 1003,
     customerName: 'Priya Sundaram',
     phone: '9765432109',
-    orderType: 'regular_delivery',
-    eventDate: '2024-09-10',
+    orderType: 'takeaway',
+    eventDate: '2026-09-01',
     eventTime: '19:30',
-    guestCount: '10',
-    dishes: 'Mutton Biriyani (x3), Chicken Rice (x2), Liver Fry (x2)',
-    address: 'Main Bazaar Street, Komarapalayam',
+    dishes: 'Chicken Noodles (x2), Chicken Fry (x1)',
+    items: [
+      { name: 'Chicken Noodles', price: 140, quantity: 2, subtotal: 280 },
+      { name: 'Chicken Fry', price: 180, quantity: 1, subtotal: 180 }
+    ],
+    address: 'Takeaway / Self Pickup',
     status: 'completed',
-    totalAmount: 1440,
-    notes: 'Home delivery order'
+    totalAmount: 460
   }
 ];
 
 const seedDB = async () => {
-  const uri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/royal_biriyani';
-
   try {
-    console.log(`Connecting to MongoDB at: ${uri}`);
-    await mongoose.connect(uri, { serverSelectionTimeoutMS: 5000 });
+    const uri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/royal_biriyani';
+    console.log('Connecting to MongoDB at:', uri);
+    await mongoose.connect(uri);
     console.log('✅ Connected to MongoDB.');
 
     // Clear existing data
     await MenuItem.deleteMany({});
     await Order.deleteMany({});
     await Admin.deleteMany({});
+
     console.log('🧹 Cleaned existing collections.');
 
-    // Seed Menu Items
-    const createdMenuItems = await MenuItem.insertMany(menuItemsData);
-    console.log(`🍛 Seeded ${createdMenuItems.length} authentic menu items.`);
+    // Insert menu items
+    await MenuItem.insertMany(menuItems);
+    console.log(`🍛 Seeded ${menuItems.length} authentic menu items with HD images.`);
 
-    // Seed Orders
-    const createdOrders = await Order.insertMany(sampleOrders);
-    console.log(`📋 Seeded ${createdOrders.length} sample orders.`);
+    // Insert sample orders
+    await Order.insertMany(sampleOrders);
+    console.log(`📋 Seeded ${sampleOrders.length} sample orders.`);
 
-    // Seed Admin
-    const adminUser = new Admin({
-      username: process.env.ADMIN_USERNAME || 'admin',
-      password: process.env.ADMIN_PASSWORD || 'admin123',
+    // Insert Admin user
+    const adminUser = process.env.ADMIN_USERNAME || 'admin';
+    const adminPass = process.env.ADMIN_PASSWORD || 'admin123';
+    const admin = new Admin({
+      username: adminUser,
+      password: adminPass,
       phone: process.env.ADMIN_PHONE || '6384945599',
       role: 'admin'
     });
-    await adminUser.save();
-    console.log(`👨‍💼 Seeded Admin account (Username: ${adminUser.username}).`);
+    await admin.save();
+    console.log(`👨‍💼 Seeded Admin account (Username: ${adminUser}).`);
 
     console.log('🎉 Database seeding completed successfully!');
     process.exit(0);
   } catch (error) {
-    console.error('❌ Database Seeding Error:', error.message);
-    console.warn('📌 Note: If MongoDB server is not running, start it or update MONGODB_URI in .env');
+    console.error('❌ Seeding failed:', error.message);
     process.exit(1);
   }
 };
