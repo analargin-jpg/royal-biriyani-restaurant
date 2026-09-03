@@ -161,16 +161,8 @@ const fallbackMenu = [
   }
 ];
 
-export default function MenuSection({ 
-  cart = [], 
-  onAddToCart, 
-  onUpdateQuantity,
-  selectedCategory,
-  onSelectCategory 
-}) {
-  const [internalCategory, setInternalCategory] = useState('Biriyani');
-  const activeCategory = selectedCategory !== undefined ? selectedCategory : internalCategory;
-  const setActiveCategory = onSelectCategory || setInternalCategory;
+export default function MenuSection({ cart = [], onAddToCart, onUpdateQuantity }) {
+  const [activeCategory, setActiveCategory] = useState('Biriyani');
   const [menuItems, setMenuItems] = useState(fallbackMenu);
   const [loading, setLoading] = useState(true);
   const [addedItemNotice, setAddedItemNotice] = useState(null);
