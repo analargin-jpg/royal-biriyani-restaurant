@@ -39,11 +39,12 @@ export default function RealTimeMap({
     // Add Zoom Control to bottom-right
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    // CartoDB Dark Matter dark tile layer
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    // 100% Free OpenStreetMap Tile Layer - Absolutely NO API key required
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
-      subdomains: 'abcd',
-      className: 'dark-tiles'
+      subdomains: ['a', 'b', 'c'],
+      className: 'dark-tiles',
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
     mapInstanceRef.current = map;
