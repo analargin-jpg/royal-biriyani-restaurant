@@ -1,7 +1,20 @@
 'use client';
 
 import React from 'react';
-import { MapPin, Phone, MessageCircle, Clock, Utensils, CheckCircle2, Navigation } from 'lucide-react';
+import Link from 'next/link';
+import dynamic from 'next/dynamic';
+import { MapPin, Phone, MessageCircle, Clock, Utensils, CheckCircle2, Navigation, RefreshCw, Sparkles, Truck } from 'lucide-react';
+
+// Dynamically import RealTimeMap to prevent SSR errors
+const RealTimeMap = dynamic(() => import('./RealTimeMap'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-80 flex flex-col items-center justify-center bg-[#121010] text-amber-300">
+      <RefreshCw className="w-6 h-6 animate-spin mb-2 text-royal-gold" />
+      <p className="text-xs font-bold">Loading Interactive Map...</p>
+    </div>
+  )
+});
 
 export default function ContactSection() {
   const supportPhone = '6384945599';
@@ -24,32 +37,43 @@ export default function ContactSection() {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        {/* Left: Map & Location Card (7 cols) */}
+        {/* Left: Embedded Interactive Map Card (7 cols) */}
         <div className="lg:col-span-7 bg-white rounded-3xl overflow-hidden shadow-lg border border-gray-200 flex flex-col">
-          {/* Map display box */}
-          <div className="h-72 sm:h-80 bg-gradient-to-br from-amber-100 via-orange-100 to-red-100 relative flex flex-col items-center justify-center p-6 text-center border-b border-gray-200">
-            <div className="w-16 h-16 rounded-2xl bg-royal-crimson text-white flex items-center justify-center mb-3 shadow-lg transform hover:scale-105 transition">
-              <MapPin className="w-8 h-8 text-royal-gold" />
-            </div>
-            <h3 className="text-xl font-extrabold text-royal-crimson">
-              Royal Biriyani &amp; Fast Food
-            </h3>
-            <p className="text-xs sm:text-sm text-gray-700 max-w-md mt-1 font-medium">
-              Salem Main Rd, Near TMMB Bank, JKK Nattraja Nagar, Komarapalayam, Tamil Nadu 638183
-            </p>
+          
+          {/* Embedded Real-Time Map (No Google Maps Redirect!) */}
+          <div className="h-80 sm:h-96 w-full relative bg-[#121010] overflow-hidden">
+            <RealTimeMap
+              restaurantLocation={[11.4428, 77.7126]}
+              coverageRadiusMeters={7000}
+            />
 
-            <a
-              href="https://maps.google.com/?q=Salem+Main+Rd+Komarapalayam+Tamil+Nadu+638183"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 bg-royal-crimson text-white text-xs font-bold rounded-xl shadow hover:bg-royal-crimson-dark transition transform hover:-translate-y-0.5"
-            >
-              <Navigation className="w-4 h-4" /> Open in Google Maps
-            </a>
+            {/* Floating Info Overlay inside the Map */}
+            <div className="absolute top-3 left-3 right-3 sm:right-auto z-10 bg-black/85 backdrop-blur-md rounded-2xl border border-amber-500/40 p-3 shadow-xl max-w-sm">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <h4 className="text-xs font-black text-amber-300">Royal Biriyani &amp; Fast Food</h4>
+              </div>
+              <p className="text-[10px] text-gray-300 leading-tight">
+                Salem Main Rd, Near TMMB Bank, Komarapalayam
+              </p>
+              <span className="inline-block mt-1 text-[9px] font-bold text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30">
+                11:00 AM – 11:00 PM • Free Delivery in 7km Zone
+              </span>
+            </div>
+
+            {/* Bottom-right button to open full tracking view inside web */}
+            <div className="absolute bottom-3 right-3 z-10">
+              <Link
+                href="/track"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-gradient-to-r from-royal-crimson to-royal-crimson-dark text-white text-xs font-black rounded-xl shadow-xl hover:brightness-110 transition border border-amber-400/40 active:scale-95"
+              >
+                <Truck className="w-3.5 h-3.5 text-amber-300" /> Open Live Delivery Tracker
+              </Link>
+            </div>
           </div>
 
           {/* Quick Info Grid */}
-          <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50">
+          <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50 border-t border-gray-200">
             <div className="flex items-start gap-3">
               <div className="p-2.5 rounded-xl bg-red-100 text-royal-crimson flex-shrink-0">
                 <Clock className="w-5 h-5" />
