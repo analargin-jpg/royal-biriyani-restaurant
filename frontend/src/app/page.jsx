@@ -24,6 +24,7 @@ export default function HomePage() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [placedOrder, setPlacedOrder] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
+  const [activeCategory, setActiveCategory] = useState('Biriyani');
 
   // Load existing logged in customer session on mount
   useEffect(() => {
@@ -101,6 +102,7 @@ export default function HomePage() {
         onOpenAuth={() => setIsAuthOpen(true)}
         onOpenProfile={() => setIsProfileOpen(true)}
         onLogout={handleLogout}
+        onSelectCategory={setActiveCategory}
       />
 
       {/* Main Content Area */}
@@ -116,6 +118,8 @@ export default function HomePage() {
           cart={cart}
           onAddToCart={handleAddToCart}
           onUpdateQuantity={handleUpdateQuantity}
+          selectedCategory={activeCategory}
+          onSelectCategory={setActiveCategory}
         />
 
         {/* Bulk Catering & Event Order Section */}

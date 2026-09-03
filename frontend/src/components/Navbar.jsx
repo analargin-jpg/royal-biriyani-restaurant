@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { 
   ShoppingCart, 
@@ -19,7 +19,11 @@ import {
   PartyPopper, 
   MapPin, 
   Clock,
-  ArrowRight
+  ArrowRight,
+  Truck,
+  Soup,
+  Drumstick,
+  Navigation
 } from 'lucide-react';
 
 export default function Navbar({ 
@@ -29,10 +33,18 @@ export default function Navbar({
   currentUser = null,
   onOpenAuth,
   onOpenProfile,
-  onLogout
+  onLogout,
+  onSelectCategory
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+
+  // Check if restaurant is currently open (11:00 AM to 11:00 PM)
+  const isKitchenOpen = useMemo(() => {
+    const now = new Date();
+    const hour = now.getHours();
+    return hour >= 11 && hour < 23;
+  }, []);
 
   const scrollToSection = (id) => {
     setMobileMenuOpen(false);
@@ -42,37 +54,46 @@ export default function Navbar({
     }
   };
 
+  const handleCategoryClick = (category) => {
+    if (onSelectCategory) {
+      onSelectCategory(category);
+    }
+    scrollToSection('menu');
+  };
+
   return (
-    <>
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-200/80 shadow-xs transition-all">
-        
-        {/* Top Announcement Bar - Mobile Optimized */}
-        <div className="bg-gradient-to-r from-royal-crimson via-royal-crimson-dark to-royal-crimson text-white text-[11px] sm:text-xs py-1.5 px-3 sm:px-4">
-          <div className="max-w-6xl mx-auto flex justify-between items-center gap-2">
-            <div className="flex items-center gap-1.5 font-medium min-w-0 truncate">
-              <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0"></span>
-              <span className="truncate text-[10px] sm:text-xs">Now Open &amp; Delivering in Komarapalayam!</span>
-            </div>
-            <div className="flex items-center gap-2 sm:gap-4 font-bold flex-shrink-0">
-              <a 
-                href="tel:+917418525405" 
-                className="hover:text-royal-gold transition flex items-center gap-1 text-[11px] sm:text-xs bg-white/10 sm:bg-transparent px-2 sm:px-0 py-0.5 sm:py-0 rounded-full"
-              >
-                <Phone className="w-3 h-3 text-royal-gold flex-shrink-0" /> 
-                <span className="hidden xs:inline">+91 74185 25405</span>
-                <span className="xs:hidden font-semibold">Call Now</span>
-              </a>
-            </div>
+    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md shadow-xs transition-all">
+      
+      {/* 1. TOP ANNOUNCEMENT BAR */}
+      <div className="bg-gradient-to-r from-royal-crimson via-royal-crimson-dark to-royal-crimson text-white text-[11px] sm:text-xs py-1.5 px-3 sm:px-4">
+        <div className="max-w-7xl mx-auto flex justify-between items-center gap-2">
+          <div className="flex items-center gap-1.5 font-medium min-w-0 truncate">
+            <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0"></span>
+            <span className="truncate text-[10px] sm:text-xs">
+              Now Open &amp; Delivering Wood-Fired Dum Biriyani in Komarapalayam!
+            </span>
+          </div>
+          <div className="flex items-center gap-2 sm:gap-4 font-bold flex-shrink-0">
+            <a 
+              href="tel:+917418525405" 
+              className="hover:text-royal-gold transition flex items-center gap-1 text-[11px] sm:text-xs bg-white/10 sm:bg-transparent px-2 sm:px-0 py-0.5 sm:py-0 rounded-full"
+            >
+              <Phone className="w-3 h-3 text-royal-gold flex-shrink-0" /> 
+              <span className="hidden xs:inline">+91 74185 25405</span>
+              <span className="xs:hidden font-semibold">Call Now</span>
+            </a>
           </div>
         </div>
+      </div>
 
-        {/* Main Navbar */}
-        <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2 sm:py-2.5 flex items-center justify-between gap-2 sm:gap-4">
+      {/* 2. MAIN PRIMARY NAVBAR */}
+      <div className="border-b border-gray-100 bg-white">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between gap-3">
           
           {/* Brand Logo & Name */}
-          <Link href="/" className="flex items-center gap-2 sm:gap-2.5 group min-w-0 flex-shrink">
-            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-br from-royal-crimson to-royal-crimson-dark flex items-center justify-center text-royal-gold shadow-md group-hover:scale-105 transition transform border border-amber-300/30 flex-shrink-0">
-              <Utensils className="w-4 h-4 sm:w-5 sm:h-5" />
+          <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group min-w-0 flex-shrink">
+            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-br from-royal-crimson to-royal-crimson-dark flex items-center justify-center text-royal-gold shadow-md group-hover:scale-105 transition transform border border-amber-300/40 flex-shrink-0">
+              <Utensils className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
@@ -89,37 +110,35 @@ export default function Navbar({
             </div>
           </Link>
 
-          {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center gap-5 lg:gap-6 text-xs sm:text-sm font-bold text-gray-700">
-            <button onClick={() => scrollToSection('menu')} className="hover:text-royal-crimson transition flex items-center gap-1.5">
-              <Utensils className="w-4 h-4 text-royal-crimson" /> Royal Menu
-            </button>
-            <button onClick={() => scrollToSection('bulk')} className="hover:text-royal-crimson transition flex items-center gap-1.5">
-              <PartyPopper className="w-4 h-4 text-amber-600" /> Bulk Catering
-            </button>
-            <button onClick={() => scrollToSection('services')} className="hover:text-royal-crimson transition flex items-center gap-1.5">
-              <Sparkles className="w-4 h-4 text-royal-gold" /> Services
-            </button>
-            <button onClick={() => scrollToSection('contact')} className="hover:text-royal-crimson transition flex items-center gap-1.5">
-              <MapPin className="w-4 h-4 text-gray-500" /> Location
-            </button>
-            <button
-              onClick={onOpenTrack}
-              className="text-royal-crimson bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-xl border border-red-200 transition flex items-center gap-1.5"
-            >
-              <Search className="w-3.5 h-3.5" /> Track Order
-            </button>
-          </nav>
+          {/* Center Callout (Desktop) */}
+          <div className="hidden lg:flex items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-amber-50/80 border border-amber-200 text-xs text-royal-charcoal font-bold">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>Hot &amp; Fresh Handi Dum Ready</span>
+            <span className="text-gray-300">•</span>
+            <a href="tel:+917418525405" className="text-royal-crimson hover:underline flex items-center gap-1">
+              <Phone className="w-3.5 h-3.5 text-royal-crimson" /> +91 74185 25405
+            </a>
+          </div>
 
           {/* Right Action Controls */}
           <div className="flex items-center gap-1.5 sm:gap-2.5 flex-shrink-0">
             
+            {/* Live Map / Track Delivery Button */}
+            <Link
+              href="/track"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 sm:py-2 rounded-xl bg-red-50 hover:bg-red-100 border border-red-200 text-royal-crimson text-xs font-black transition shadow-2xs active:scale-95"
+              title="Live Delivery Map & Tracking"
+            >
+              <Truck className="w-3.5 h-3.5 text-royal-crimson" />
+              <span>Live Tracking</span>
+            </Link>
+
             {/* User Auth / Profile Dropdown */}
             {currentUser ? (
               <div className="relative">
                 <button
                   onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                  className="flex items-center gap-1 sm:gap-1.5 py-1 px-2 sm:py-1.5 sm:px-3 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-royal-charcoal text-xs font-bold transition shadow-xs flex-shrink-0"
+                  className="flex items-center gap-1 sm:gap-1.5 py-1 px-2 sm:py-1.5 sm:px-3 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-royal-charcoal text-xs font-bold transition shadow-2xs flex-shrink-0"
                   aria-label="User Account Menu"
                 >
                   <div className="w-6 h-6 rounded-full bg-royal-crimson text-white flex items-center justify-center text-xs font-black flex-shrink-0">
@@ -131,7 +150,6 @@ export default function Navbar({
 
                 {userDropdownOpen && (
                   <>
-                    {/* Backdrop to close on click outside on mobile */}
                     <div 
                       className="fixed inset-0 z-40" 
                       onClick={() => setUserDropdownOpen(false)} 
@@ -170,14 +188,14 @@ export default function Navbar({
             ) : (
               <button
                 onClick={onOpenAuth}
-                className="inline-flex items-center gap-1 py-1.5 px-2.5 sm:py-2 sm:px-3 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-royal-crimson font-extrabold text-xs transition shadow-xs flex-shrink-0"
+                className="inline-flex items-center gap-1 py-1.5 px-2.5 sm:py-2 sm:px-3 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-royal-crimson font-extrabold text-xs transition shadow-2xs flex-shrink-0"
               >
                 <LogIn className="w-3.5 h-3.5 text-royal-crimson" />
                 <span className="hidden xs:inline">Sign In</span>
               </button>
             )}
 
-            {/* Cart Button */}
+            {/* Shopping Cart Button */}
             <button
               onClick={onOpenCart}
               className="relative p-2 sm:p-2.5 rounded-xl bg-gray-100 hover:bg-red-50 text-gray-800 hover:text-royal-crimson transition shadow-inner flex items-center justify-center active:scale-95 flex-shrink-0"
@@ -191,14 +209,6 @@ export default function Navbar({
               )}
             </button>
 
-            {/* Call Now Button (Desktop only) */}
-            <a
-              href="tel:+917418525405"
-              className="hidden lg:inline-flex items-center gap-1.5 px-3.5 py-2 bg-royal-crimson hover:bg-royal-crimson-dark text-white text-xs font-black rounded-xl shadow transition active:scale-95"
-            >
-              <Phone className="w-3.5 h-3.5 text-royal-gold" /> Call Now
-            </a>
-
             {/* Mobile Hamburger Button */}
             <button
               onClick={() => setMobileMenuOpen(true)}
@@ -209,15 +219,93 @@ export default function Navbar({
             </button>
           </div>
         </div>
-      </header>
+      </div>
 
-      {/* Modern Slide-out Mobile Navigation Drawer */}
+      {/* 3. SUB NAVBAR (Secondary Category & Quick Navigation Bar) */}
+      <div className="bg-amber-50/90 border-b border-amber-200/70 py-1.5 px-3 sm:px-4 shadow-2xs">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
+          
+          {/* Scrollable Sub Navbar Pills */}
+          <nav className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar py-0.5 w-full md:w-auto">
+            
+            {/* 1. Biriyani Category */}
+            <button
+              onClick={() => handleCategoryClick('Biriyani')}
+              className="px-3 py-1 rounded-xl text-xs font-bold text-gray-800 hover:text-royal-crimson bg-white hover:bg-amber-100 border border-amber-200/80 transition flex items-center gap-1.5 whitespace-nowrap shadow-2xs active:scale-95"
+            >
+              <Utensils className="w-3.5 h-3.5 text-royal-crimson" />
+              <span>Royal Biriyani</span>
+            </button>
+
+            {/* 2. Starters Category */}
+            <button
+              onClick={() => handleCategoryClick('Starters & Gravy')}
+              className="px-3 py-1 rounded-xl text-xs font-bold text-gray-800 hover:text-royal-crimson bg-white hover:bg-amber-100 border border-amber-200/80 transition flex items-center gap-1.5 whitespace-nowrap shadow-2xs active:scale-95"
+            >
+              <Drumstick className="w-3.5 h-3.5 text-amber-700" />
+              <span>Starters &amp; 65</span>
+            </button>
+
+            {/* 3. Fast Food & Noodles */}
+            <button
+              onClick={() => handleCategoryClick('Fast Food & Noodles')}
+              className="px-3 py-1 rounded-xl text-xs font-bold text-gray-800 hover:text-royal-crimson bg-white hover:bg-amber-100 border border-amber-200/80 transition flex items-center gap-1.5 whitespace-nowrap shadow-2xs active:scale-95"
+            >
+              <Soup className="w-3.5 h-3.5 text-orange-600" />
+              <span>Fried Rice &amp; Noodles</span>
+            </button>
+
+            {/* 4. Bulk Catering */}
+            <button
+              onClick={() => scrollToSection('bulk')}
+              className="px-3 py-1 rounded-xl text-xs font-extrabold text-amber-900 bg-amber-200/80 hover:bg-amber-300 border border-amber-300 transition flex items-center gap-1.5 whitespace-nowrap shadow-2xs active:scale-95"
+            >
+              <PartyPopper className="w-3.5 h-3.5 text-amber-800" />
+              <span>Bulk Catering (50-2000+)</span>
+            </button>
+
+            {/* 5. Live Delivery Map Link */}
+            <Link
+              href="/track"
+              className="px-3 py-1 rounded-xl text-xs font-bold text-gray-800 hover:text-royal-crimson bg-white hover:bg-amber-100 border border-amber-200/80 transition flex items-center gap-1.5 whitespace-nowrap shadow-2xs active:scale-95"
+            >
+              <Navigation className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Delivery Map</span>
+            </Link>
+
+            {/* 6. Location & Dining */}
+            <button
+              onClick={() => scrollToSection('contact')}
+              className="px-3 py-1 rounded-xl text-xs font-bold text-gray-800 hover:text-royal-crimson bg-white hover:bg-amber-100 border border-amber-200/80 transition flex items-center gap-1.5 whitespace-nowrap shadow-2xs active:scale-95"
+            >
+              <MapPin className="w-3.5 h-3.5 text-red-600" />
+              <span>Location &amp; Dining</span>
+            </button>
+
+          </nav>
+
+          {/* Right Highlights: Kitchen Status & Speed (Desktop & Tablet) */}
+          <div className="hidden md:flex items-center gap-2 flex-shrink-0 text-[11px] font-bold">
+            <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
+              <span className={`w-1.5 h-1.5 rounded-full ${isKitchenOpen ? 'bg-emerald-600 animate-pulse' : 'bg-red-600'}`}></span>
+              {isKitchenOpen ? 'Kitchen Open (11 AM - 11 PM)' : 'Opens at 11 AM'}
+            </span>
+            <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
+              <Clock className="w-3 h-3 text-amber-700" />
+              ⚡ 25-35m Delivery
+            </span>
+          </div>
+
+        </div>
+      </div>
+
+      {/* 4. MODERN MOBILE NAVIGATION DRAWER */}
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-50 md:hidden flex justify-end animate-fade-in">
           {/* Backdrop */}
           <div 
             onClick={() => setMobileMenuOpen(false)}
-            className="absolute inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
+            className="absolute inset-0 bg-black/60 backdrop-blur-2xs transition-opacity"
           />
 
           {/* Drawer Panel */}
@@ -244,7 +332,7 @@ export default function Navbar({
                 </button>
               </div>
 
-              {/* User Account Card inside Mobile Drawer */}
+              {/* User Account Card */}
               <div className="p-4 border-b border-gray-100 bg-gray-50">
                 {currentUser ? (
                   <div className="flex items-center justify-between">
@@ -276,19 +364,47 @@ export default function Navbar({
 
               {/* Navigation Links */}
               <div className="p-3 space-y-1 text-xs font-bold text-gray-700">
+                <div className="px-3 py-1 text-[10px] font-black uppercase tracking-wider text-gray-400">
+                  Quick Menu Categories
+                </div>
+
                 <button
-                  onClick={() => scrollToSection('menu')}
-                  className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-red-50 hover:text-royal-crimson transition text-left"
+                  onClick={() => { handleCategoryClick('Biriyani'); }}
+                  className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-red-50 hover:text-royal-crimson transition text-left"
                 >
                   <span className="flex items-center gap-2.5">
-                    <Utensils className="w-4 h-4 text-royal-crimson" /> Explore Royal Menu
+                    <Utensils className="w-4 h-4 text-royal-crimson" /> Royal Dum Biriyani
                   </span>
                   <ArrowRight className="w-3.5 h-3.5 text-gray-400" />
                 </button>
 
                 <button
+                  onClick={() => { handleCategoryClick('Starters & Gravy'); }}
+                  className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-amber-50 hover:text-amber-900 transition text-left"
+                >
+                  <span className="flex items-center gap-2.5">
+                    <Drumstick className="w-4 h-4 text-amber-700" /> Starters &amp; Chicken 65
+                  </span>
+                  <ArrowRight className="w-3.5 h-3.5 text-gray-400" />
+                </button>
+
+                <button
+                  onClick={() => { handleCategoryClick('Fast Food & Noodles'); }}
+                  className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-orange-50 hover:text-orange-900 transition text-left"
+                >
+                  <span className="flex items-center gap-2.5">
+                    <Soup className="w-4 h-4 text-orange-600" /> Fried Rice &amp; Noodles
+                  </span>
+                  <ArrowRight className="w-3.5 h-3.5 text-gray-400" />
+                </button>
+
+                <div className="pt-2 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-gray-400">
+                  Services &amp; Operations
+                </div>
+
+                <button
                   onClick={() => scrollToSection('bulk')}
-                  className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-amber-50 hover:text-amber-900 transition text-left"
+                  className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-amber-50 hover:text-amber-900 transition text-left"
                 >
                   <span className="flex items-center gap-2.5">
                     <PartyPopper className="w-4 h-4 text-amber-600" /> Bulk Event Catering
@@ -296,34 +412,25 @@ export default function Navbar({
                   <ArrowRight className="w-3.5 h-3.5 text-gray-400" />
                 </button>
 
-                <button
-                  onClick={() => scrollToSection('services')}
-                  className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-red-50 hover:text-royal-crimson transition text-left"
+                <Link
+                  href="/track"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full flex items-center justify-between p-2.5 rounded-xl bg-red-50 text-royal-crimson border border-red-200 transition text-left"
                 >
-                  <span className="flex items-center gap-2.5">
-                    <Sparkles className="w-4 h-4 text-royal-gold" /> Special Services
+                  <span className="flex items-center gap-2.5 font-black">
+                    <Navigation className="w-4 h-4 text-emerald-600" /> Live Delivery Map &amp; Tracking
                   </span>
-                  <ArrowRight className="w-3.5 h-3.5 text-gray-400" />
-                </button>
+                  <ArrowRight className="w-3.5 h-3.5 text-royal-crimson" />
+                </Link>
 
                 <button
                   onClick={() => scrollToSection('contact')}
-                  className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-red-50 hover:text-royal-crimson transition text-left"
+                  className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-red-50 hover:text-royal-crimson transition text-left"
                 >
                   <span className="flex items-center gap-2.5">
-                    <MapPin className="w-4 h-4 text-gray-500" /> Contact &amp; Location
+                    <MapPin className="w-4 h-4 text-gray-500" /> Contact &amp; Dining Location
                   </span>
                   <ArrowRight className="w-3.5 h-3.5 text-gray-400" />
-                </button>
-
-                <button
-                  onClick={() => { setMobileMenuOpen(false); onOpenTrack(); }}
-                  className="w-full flex items-center justify-between p-3 rounded-xl bg-red-50 text-royal-crimson border border-red-200 transition text-left"
-                >
-                  <span className="flex items-center gap-2.5 font-black">
-                    <Search className="w-4 h-4 text-royal-crimson" /> Track Live Order
-                  </span>
-                  <ArrowRight className="w-3.5 h-3.5 text-royal-crimson" />
                 </button>
               </div>
             </div>
@@ -341,6 +448,6 @@ export default function Navbar({
           </div>
         </div>
       )}
-    </>
+    </header>
   );
 }
