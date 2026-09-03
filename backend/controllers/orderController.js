@@ -63,13 +63,26 @@ const isDbReady = () => mongoose.connection.readyState === 1;
 // @route   GET /api/orders
 exports.getOrders = async (req, res) => {
   try {
-    const { status, search, limit = 100, page = 1 } = req.query;
+    const { status, search, orderType, limit = 100, page = 1 } = req.query;
+
+    let dbOrders = [];
+    let total = 0;
 
     if (isDbReady()) {
       const query = {};
 
       if (status && status !== 'all') {
         query.status = status.toLowerCase();
+      }
+
+      if (orderType && orderType !== 'all') {
+        if (orderType === 'bulk') {
+          query.orderType = 'bulk';
+        } else if (orderType === 'single') {
+          query.orderType = { $ne: 'bulk' };
+        } else {
+          query.orderType = orderType;
+        }
       }
 
       if (search) {
@@ -91,45 +104,61 @@ exports.getOrders = async (req, res) => {
         }
       }
 
-      const orders = await Order.find(query)
+      dbOrders = await Order.find(query)
         .sort({ createdAt: -1 })
         .limit(Number(limit))
         .skip((Number(page) - 1) * Number(limit));
 
-      const total = await Order.countDocuments(query);
-
-      return res.json({
-        success: true,
-        count: orders.length,
-        total,
-        data: orders
-      });
+      total = await Order.countDocuments(query);
     }
 
-    // Always reload from persistent file store
+    // Always merge any locally cached orders so nothing is ever dropped
     memoryOrders = loadFileOrders();
+    const orderMap = new Map();
 
-    const filtered = memoryOrders.filter(o => {
-      if (status && status !== 'all' && o.status !== status) return false;
-      if (search) {
-        const s = search.toLowerCase();
-        return (
-          (o.customerName && o.customerName.toLowerCase().includes(s)) ||
-          (o.phone && o.phone.includes(s)) ||
-          String(o.orderId || '').includes(s) ||
-          (o.dishes && o.dishes.toLowerCase().includes(s)) ||
-          (o.address && o.address.toLowerCase().includes(s))
-        );
+    // Add DB orders
+    dbOrders.forEach(o => {
+      const plain = o.toObject ? o.toObject() : o;
+      orderMap.set(String(plain.orderId || plain._id), plain);
+    });
+
+    // Add memory orders if not already in DB
+    memoryOrders.forEach(o => {
+      const key = String(o.orderId || o._id);
+      if (!orderMap.has(key)) {
+        // Apply filters
+        let matches = true;
+        if (status && status !== 'all' && o.status !== status) matches = false;
+        if (orderType && orderType !== 'all') {
+          if (orderType === 'bulk' && o.orderType !== 'bulk') matches = false;
+          if (orderType === 'single' && o.orderType === 'bulk') matches = false;
+        }
+        if (search) {
+          const s = search.toLowerCase();
+          const matchSearch =
+            (o.customerName && o.customerName.toLowerCase().includes(s)) ||
+            (o.phone && o.phone.includes(s)) ||
+            String(o.orderId || '').includes(s) ||
+            (o.dishes && o.dishes.toLowerCase().includes(s)) ||
+            (o.address && o.address.toLowerCase().includes(s));
+          if (!matchSearch) matches = false;
+        }
+        if (matches) {
+          orderMap.set(key, o);
+        }
       }
-      return true;
+    });
+
+    const allOrders = Array.from(orderMap.values()).sort((a, b) => {
+      return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
     });
 
     return res.json({
       success: true,
-      count: filtered.length,
-      total: filtered.length,
-      data: filtered,
-      isFallback: true
+      count: allOrders.length,
+      total: Math.max(total, allOrders.length),
+      data: allOrders,
+      isFallback: !isDbReady()
     });
   } catch (error) {
     console.error('getOrders error:', error.message);
@@ -167,14 +196,14 @@ exports.getOrderById = async (req, res) => {
   }
 };
 
-// @desc    Create new order (Bulk or Cart)
+// @desc    Create new order (Single item, Cart, Delivery, or Bulk Catering)
 // @route   POST /api/orders
 exports.createOrder = async (req, res) => {
   try {
     const {
       customerName,
       phone,
-      orderType = 'bulk',
+      orderType = 'single',
       eventDate,
       eventTime,
       guestCount,
@@ -192,25 +221,59 @@ exports.createOrder = async (req, res) => {
       });
     }
 
-    let finalDishes = dishes;
+    let finalDishes = (dishes && String(dishes).trim()) ? String(dishes).trim() : '';
     if (!finalDishes && items && Array.isArray(items) && items.length > 0) {
-      finalDishes = items.map(i => `${i.name} (x${i.quantity})`).join(', ');
+      finalDishes = items.map(i => `${i.name || 'Dish'} (x${i.quantity || 1})`).join(', ');
     }
     if (!finalDishes) {
-      finalDishes = 'Assorted Menu Selection';
+      finalDishes = 'Assorted Menu Order';
+    }
+
+    // Format and sanitize items array safely
+    const formattedItems = (items && Array.isArray(items))
+      ? items.map(i => ({
+          name: i.name || 'Dish',
+          price: Number(i.price) || 0,
+          quantity: Number(i.quantity) || 1,
+          subtotal: Number(i.subtotal) || ((Number(i.price) || 0) * (Number(i.quantity) || 1))
+        }))
+      : [];
+
+    // Calculate totalAmount if not provided
+    let finalTotal = Number(totalAmount);
+    if (isNaN(finalTotal) || finalTotal <= 0) {
+      finalTotal = formattedItems.reduce((sum, i) => sum + i.subtotal, 0);
+    }
+
+    // Determine sequential orderId
+    let nextOrderId = 1002;
+    if (isDbReady()) {
+      try {
+        const lastOrder = await Order.findOne({ orderId: { $exists: true } }).sort({ orderId: -1 });
+        if (lastOrder && lastOrder.orderId && !isNaN(lastOrder.orderId)) {
+          nextOrderId = Number(lastOrder.orderId) + 1;
+        }
+      } catch (e) {
+        console.warn('Error querying last orderId:', e.message);
+      }
+    } else {
+      memoryOrders = loadFileOrders();
+      const maxId = memoryOrders.reduce((max, o) => Math.max(max, o.orderId || 0), 1000);
+      nextOrderId = maxId + 1;
     }
 
     const newOrderData = {
-      customerName,
-      phone,
-      orderType,
+      orderId: nextOrderId,
+      customerName: customerName.trim(),
+      phone: phone.trim(),
+      orderType: orderType || 'single',
       eventDate: eventDate || new Date().toISOString().split('T')[0],
-      eventTime: eventTime || '12:00',
-      guestCount: guestCount || 'N/A',
+      eventTime: eventTime || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      guestCount: guestCount || (orderType === 'bulk' ? '50+' : '1 (Single Order)'),
       dishes: finalDishes,
-      items: items || [],
-      totalAmount: totalAmount || 0,
-      address,
+      items: formattedItems,
+      totalAmount: finalTotal,
+      address: address.trim(),
       notes: notes || '',
       status: 'pending'
     };
@@ -220,31 +283,37 @@ exports.createOrder = async (req, res) => {
     if (isDbReady()) {
       try {
         order = await Order.create(newOrderData);
+        console.log(`✅ Order #${order.orderId} (${order.orderType}) saved directly to MongoDB Atlas!`);
       } catch (dbErr) {
-        console.warn('DB create failed, using persistent file store:', dbErr.message);
+        console.error('❌ DB create error, using backup file store:', dbErr.message);
       }
     }
 
-    if (!order) {
-      memoryOrders = loadFileOrders();
-      const maxId = memoryOrders.reduce((max, o) => Math.max(max, o.orderId || 0), 1000);
-      order = {
-        _id: 'ord_' + Date.now(),
-        orderId: maxId + 1,
-        ...newOrderData,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-      memoryOrders.unshift(order);
-      saveFileOrders(memoryOrders);
+    // Save to persistent file backup
+    memoryOrders = loadFileOrders();
+    const fallbackOrder = order ? (order.toObject ? order.toObject() : order) : {
+      _id: 'ord_' + Date.now(),
+      ...newOrderData,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    
+    // Unshift to local memory and file
+    const existingIdx = memoryOrders.findIndex(o => o.orderId === fallbackOrder.orderId);
+    if (existingIdx === -1) {
+      memoryOrders.unshift(fallbackOrder);
+    } else {
+      memoryOrders[existingIdx] = fallbackOrder;
     }
+    saveFileOrders(memoryOrders);
 
     return res.status(201).json({
       success: true,
       message: 'Order placed successfully!',
-      data: order
+      data: order || fallbackOrder
     });
   } catch (error) {
+    console.error('createOrder exception:', error.message);
     return res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -266,26 +335,20 @@ exports.updateOrderStatus = async (req, res) => {
     let order = null;
 
     if (isDbReady()) {
-      try {
-        if (id.match(/^[0-9a-fA-F]{24}$/)) {
-          order = await Order.findByIdAndUpdate(id, { status }, { new: true });
-        } else {
-          order = await Order.findOneAndUpdate({ orderId: Number(id) }, { status }, { new: true });
-        }
-      } catch (err) {
-        console.warn('DB status update error:', err.message);
+      if (id.match(/^[0-9a-fA-F]{24}$/)) {
+        order = await Order.findByIdAndUpdate(id, { status }, { new: true });
+      } else {
+        order = await Order.findOneAndUpdate({ orderId: Number(id) }, { status }, { new: true });
       }
     }
 
-    if (!order) {
-      memoryOrders = loadFileOrders();
-      const idx = memoryOrders.findIndex(o => String(o.orderId) === id || o._id === id);
-      if (idx !== -1) {
-        memoryOrders[idx].status = status;
-        memoryOrders[idx].updatedAt = new Date().toISOString();
-        order = memoryOrders[idx];
-        saveFileOrders(memoryOrders);
-      }
+    memoryOrders = loadFileOrders();
+    const idx = memoryOrders.findIndex(o => String(o.orderId) === id || o._id === id);
+    if (idx !== -1) {
+      memoryOrders[idx].status = status;
+      memoryOrders[idx].updatedAt = new Date().toISOString();
+      if (!order) order = memoryOrders[idx];
+      saveFileOrders(memoryOrders);
     }
 
     if (!order) {
@@ -302,45 +365,6 @@ exports.updateOrderStatus = async (req, res) => {
   }
 };
 
-// @desc    Update full order
-// @route   PUT /api/orders/:id
-exports.updateOrder = async (req, res) => {
-  try {
-    const { id } = req.params;
-    let order = null;
-
-    if (isDbReady()) {
-      try {
-        if (id.match(/^[0-9a-fA-F]{24}$/)) {
-          order = await Order.findByIdAndUpdate(id, req.body, { new: true, runValidators: true });
-        } else {
-          order = await Order.findOneAndUpdate({ orderId: Number(id) }, req.body, { new: true, runValidators: true });
-        }
-      } catch (err) {
-        console.warn('DB update order error:', err.message);
-      }
-    }
-
-    if (!order) {
-      memoryOrders = loadFileOrders();
-      const idx = memoryOrders.findIndex(o => String(o.orderId) === id || o._id === id);
-      if (idx !== -1) {
-        memoryOrders[idx] = { ...memoryOrders[idx], ...req.body, updatedAt: new Date().toISOString() };
-        order = memoryOrders[idx];
-        saveFileOrders(memoryOrders);
-      }
-    }
-
-    if (!order) {
-      return res.status(404).json({ success: false, message: 'Order not found' });
-    }
-
-    return res.json({ success: true, message: 'Order updated', data: order });
-  } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
-  }
-};
-
 // @desc    Delete order
 // @route   DELETE /api/orders/:id
 exports.deleteOrder = async (req, res) => {
@@ -348,14 +372,10 @@ exports.deleteOrder = async (req, res) => {
     const { id } = req.params;
 
     if (isDbReady()) {
-      try {
-        if (id.match(/^[0-9a-fA-F]{24}$/)) {
-          await Order.findByIdAndDelete(id);
-        } else {
-          await Order.findOneAndDelete({ orderId: Number(id) });
-        }
-      } catch (err) {
-        console.warn('DB delete error:', err.message);
+      if (id.match(/^[0-9a-fA-F]{24}$/)) {
+        await Order.findByIdAndDelete(id);
+      } else {
+        await Order.findOneAndDelete({ orderId: Number(id) });
       }
     }
 
@@ -382,6 +402,8 @@ exports.getOrderStats = async (req, res) => {
       const confirmed = await Order.countDocuments({ status: 'confirmed' });
       const completed = await Order.countDocuments({ status: 'completed' });
       const cancelled = await Order.countDocuments({ status: 'cancelled' });
+      const singleOrders = await Order.countDocuments({ orderType: { $ne: 'bulk' } });
+      const bulkOrders = await Order.countDocuments({ orderType: 'bulk' });
 
       const ordersWithGuests = await Order.find({ guestCount: { $exists: true, $ne: 'N/A' } }, 'guestCount');
       let totalGuests = 0;
@@ -392,7 +414,7 @@ exports.getOrderStats = async (req, res) => {
 
       return res.json({
         success: true,
-        data: { total, pending, confirmed, completed, cancelled, totalGuests }
+        data: { total, pending, confirmed, completed, cancelled, singleOrders, bulkOrders, totalGuests }
       });
     }
 
@@ -402,6 +424,8 @@ exports.getOrderStats = async (req, res) => {
     const confirmed = memoryOrders.filter(o => o.status === 'confirmed').length;
     const completed = memoryOrders.filter(o => o.status === 'completed').length;
     const cancelled = memoryOrders.filter(o => o.status === 'cancelled').length;
+    const singleOrders = memoryOrders.filter(o => o.orderType !== 'bulk').length;
+    const bulkOrders = memoryOrders.filter(o => o.orderType === 'bulk').length;
     const totalGuests = memoryOrders.reduce((sum, o) => {
       const val = parseInt(o.guestCount, 10);
       return !isNaN(val) ? sum + val : sum;
@@ -409,7 +433,7 @@ exports.getOrderStats = async (req, res) => {
 
     return res.json({
       success: true,
-      data: { total, pending, confirmed, completed, cancelled, totalGuests },
+      data: { total, pending, confirmed, completed, cancelled, singleOrders, bulkOrders, totalGuests },
       isFallback: true
     });
   } catch (error) {
@@ -449,12 +473,13 @@ exports.trackOrder = async (req, res) => {
 
     if (orders.length === 0) {
       memoryOrders = loadFileOrders();
-      orders = memoryOrders.filter(o => 
-        String(o.orderId) === cleanQuery || 
-        String(o.orderId) === raw ||
-        (o.phone && o.phone.includes(cleanQuery)) || 
-        (o.customerName && o.customerName.toLowerCase().includes(cleanQuery.toLowerCase()))
-      );
+      orders = memoryOrders.filter(o => {
+        return (
+          String(o.orderId) === cleanQuery ||
+          (o.phone && o.phone.includes(cleanQuery)) ||
+          (o.customerName && o.customerName.toLowerCase().includes(cleanQuery.toLowerCase()))
+        );
+      });
     }
 
     return res.json({

@@ -1,10 +1,14 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Phone, Calendar, Clock, Users, MapPin, MessageCircle, Send, Trash2, Edit, AlertCircle, Utensils } from 'lucide-react';
+import { Phone, Calendar, Clock, Users, MapPin, MessageCircle, Send, Trash2, Utensils, Truck, ShoppingBag, PartyPopper } from 'lucide-react';
 
 export default function OrderCard({ order, onStatusChange, onDelete, adminPhone = '6384945599' }) {
   const [updating, setUpdating] = useState(false);
+
+  const isBulk = order.orderType === 'bulk';
+  const isTakeaway = order.orderType === 'takeaway';
+  const isSingle = !isBulk && !isTakeaway;
 
   const handleStatusSelect = async (newStatus) => {
     try {
@@ -20,14 +24,14 @@ export default function OrderCard({ order, onStatusChange, onDelete, adminPhone 
       `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
       `✅ *Order ID:* #${order.orderId || order._id}\n` +
       `👤 *Name:* ${order.customerName}\n` +
-      `📅 *Event Date:* ${order.eventDate}\n` +
+      `📅 *Date:* ${order.eventDate}\n` +
       `🕐 *Time:* ${order.eventTime}\n` +
-      (order.guestCount && order.guestCount !== 'N/A' ? `👥 *Guests:* ${order.guestCount} Guests\n` : '') +
-      `🍽️ *Menu:* ${order.dishes}\n` +
-      `📍 *Location:* ${order.address}\n` +
+      (isBulk && order.guestCount && order.guestCount !== 'N/A' ? `👥 *Guests:* ${order.guestCount} Guests\n` : '') +
+      `🍽️ *Menu / Items:* ${order.dishes}\n` +
+      `📍 *Delivery Address:* ${order.address}\n` +
       (order.totalAmount ? `💰 *Total Amount:* ₹${order.totalAmount}\n` : '') +
       `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-      `We have confirmed your order and started preparations! For any adjustments, call +91 74185 25405.`;
+      `We have confirmed your order and started fresh preparations! For adjustments, call +91 74185 25405.`;
 
     const encoded = encodeURIComponent(message);
     window.open(`https://wa.me/${order.phone}?text=${encoded}`, '_blank');
@@ -41,9 +45,10 @@ export default function OrderCard({ order, onStatusChange, onDelete, adminPhone 
       `📱 *Phone:* ${order.phone}\n` +
       `📅 *Date:* ${order.eventDate}\n` +
       `🕐 *Time:* ${order.eventTime}\n` +
-      (order.guestCount && order.guestCount !== 'N/A' ? `👥 *Guests:* ${order.guestCount} Guests\n` : '') +
-      `🍽️ *Menu / Dishes:* ${order.dishes}\n` +
+      (isBulk && order.guestCount && order.guestCount !== 'N/A' ? `👥 *Guests:* ${order.guestCount} Guests\n` : '') +
+      `🍽️ *Menu / Items:* ${order.dishes}\n` +
       `📍 *Address:* ${order.address}\n` +
+      (order.totalAmount ? `💰 *Total Amount:* ₹${order.totalAmount}\n` : '') +
       (order.notes ? `📝 *Notes:* ${order.notes}\n` : '') +
       `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
       `Please check kitchen stock and confirm delivery schedule.`;
@@ -64,12 +69,24 @@ export default function OrderCard({ order, onStatusChange, onDelete, adminPhone 
       {/* Top Header Row */}
       <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-gray-100">
         <div className="flex items-center gap-2">
-          <span className="font-extrabold text-lg text-royal-crimson">
+          <span className="font-black text-lg text-royal-crimson">
             #{order.orderId || '1001'}
           </span>
-          <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-gray-100 text-gray-700">
-            {order.orderType?.replace('_', ' ') || 'Bulk'}
-          </span>
+          
+          {/* Order Type Badge */}
+          {isBulk ? (
+            <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300 flex items-center gap-1">
+              <PartyPopper className="w-3 h-3" /> Bulk Catering
+            </span>
+          ) : isTakeaway ? (
+            <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-800 border border-purple-300 flex items-center gap-1">
+              <ShoppingBag className="w-3 h-3" /> Takeaway / Pickup
+            </span>
+          ) : (
+            <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1">
+              <Truck className="w-3 h-3" /> Single Delivery Order
+            </span>
+          )}
         </div>
 
         {/* Status Dropdown */}
@@ -96,6 +113,7 @@ export default function OrderCard({ order, onStatusChange, onDelete, adminPhone 
             onClick={() => onDelete(order._id || order.orderId)}
             className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition"
             title="Delete Order"
+            aria-label="Delete Order"
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -117,24 +135,39 @@ export default function OrderCard({ order, onStatusChange, onDelete, adminPhone 
         </div>
 
         <div>
-          <span className="text-gray-400 uppercase font-bold block text-[10px]">Event Date &amp; Time</span>
+          <span className="text-gray-400 uppercase font-bold block text-[10px]">Order Date &amp; Time</span>
           <p className="font-bold text-gray-800 flex items-center gap-1">
             <Calendar className="w-3 h-3 text-gray-500" /> {order.eventDate} @ {order.eventTime}
           </p>
         </div>
 
         <div>
-          <span className="text-gray-400 uppercase font-bold block text-[10px]">Guest Count</span>
-          <p className="font-bold text-gray-800 flex items-center gap-1">
-            <Users className="w-3 h-3 text-gray-500" /> {order.guestCount} Guests
-          </p>
+          <span className="text-gray-400 uppercase font-bold block text-[10px]">
+            {isBulk ? 'Guest Count' : 'Total Amount'}
+          </span>
+          {isBulk ? (
+            <p className="font-bold text-gray-800 flex items-center gap-1">
+              <Users className="w-3 h-3 text-gray-500" /> {order.guestCount || '50+'} Guests
+            </p>
+          ) : (
+            <p className="font-black text-emerald-700 text-sm">
+              ₹{order.totalAmount || 0}
+            </p>
+          )}
         </div>
 
-        {/* Menu/Dishes */}
+        {/* Menu/Dishes Summary */}
         <div className="sm:col-span-2 lg:col-span-4 bg-gray-50 p-3 rounded-xl border border-gray-100">
-          <span className="text-gray-400 uppercase font-bold block text-[10px] mb-0.5 flex items-center gap-1">
-            <Utensils className="w-3 h-3" /> Menu / Ordered Items
-          </span>
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-gray-500 uppercase font-bold block text-[10px] flex items-center gap-1">
+              <Utensils className="w-3 h-3 text-royal-crimson" /> Menu / Ordered Items
+            </span>
+            {order.totalAmount > 0 && (
+              <span className="font-black text-royal-crimson text-xs">
+                Total: ₹{order.totalAmount}
+              </span>
+            )}
+          </div>
           <p className="font-bold text-gray-900 text-xs sm:text-sm">{order.dishes}</p>
           {order.notes && (
             <p className="text-[11px] text-amber-800 mt-1 italic">
@@ -172,7 +205,7 @@ export default function OrderCard({ order, onStatusChange, onDelete, adminPhone 
             onClick={handleNotifyAdmin}
             className="flex-1 sm:flex-none px-4 py-2 bg-royal-crimson hover:bg-royal-crimson-dark text-white font-bold text-xs rounded-xl shadow-xs hover:shadow transition flex items-center justify-center gap-1.5"
           >
-            <Send className="w-4 h-4" /> Notify Admin ({adminPhone})
+            <Send className="w-4 h-4" /> Notify Kitchen ({adminPhone})
           </button>
         </div>
       </div>

@@ -2,9 +2,9 @@ const mongoose = require('mongoose');
 
 const OrderItemSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  price: { type: Number, required: true },
-  quantity: { type: Number, required: true, default: 1 },
-  subtotal: { type: Number, required: true }
+  price: { type: Number, default: 0 },
+  quantity: { type: Number, default: 1 },
+  subtotal: { type: Number, default: 0 }
 }, { _id: false });
 
 const OrderSchema = new mongoose.Schema({
@@ -24,8 +24,7 @@ const OrderSchema = new mongoose.Schema({
   },
   orderType: {
     type: String,
-    enum: ['bulk', 'regular_delivery', 'takeaway', 'dine_in'],
-    default: 'bulk'
+    default: 'single'
   },
   eventDate: {
     type: String,
@@ -70,8 +69,8 @@ const OrderSchema = new mongoose.Schema({
 OrderSchema.pre('save', async function(next) {
   if (!this.orderId) {
     try {
-      const lastOrder = await mongoose.model('Order').findOne({}, {}, { sort: { orderId: -1 } });
-      this.orderId = lastOrder && lastOrder.orderId ? lastOrder.orderId + 1 : 1001;
+      const lastOrder = await mongoose.model('Order').findOne({ orderId: { $exists: true } }, {}, { sort: { orderId: -1 } });
+      this.orderId = (lastOrder && lastOrder.orderId && !isNaN(lastOrder.orderId)) ? lastOrder.orderId + 1 : 1002;
     } catch (err) {
       this.orderId = Math.floor(1000 + Math.random() * 9000);
     }

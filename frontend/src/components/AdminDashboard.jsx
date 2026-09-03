@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import StatCards from './StatCards';
 import OrderCard from './OrderCard';
 import MenuManager from './MenuManager';
-import { Plus, RefreshCw, Search, Download, LogOut, Utensils, ShoppingBag, Phone, ShieldCheck, X } from 'lucide-react';
+import { Plus, RefreshCw, Search, Download, LogOut, Utensils, ShoppingBag, Phone, ShieldCheck, X, Truck, PartyPopper, Filter } from 'lucide-react';
 import { orderApi } from '../lib/api';
 
 export default function AdminDashboard({ admin, onLogout }) {
@@ -13,6 +13,7 @@ export default function AdminDashboard({ admin, onLogout }) {
   const [stats, setStats] = useState({});
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('all');
+  const [orderTypeFilter, setOrderTypeFilter] = useState('all'); // 'all', 'single', 'bulk'
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddOrderOpen, setIsAddOrderOpen] = useState(false);
 
@@ -21,11 +22,12 @@ export default function AdminDashboard({ admin, onLogout }) {
     customerName: '',
     phone: '',
     eventDate: new Date().toISOString().split('T')[0],
-    eventTime: '18:00',
-    guestCount: '100',
+    eventTime: '13:00',
+    guestCount: '1 (Single Order)',
     dishes: '',
+    totalAmount: 0,
     address: '',
-    orderType: 'bulk',
+    orderType: 'single',
     notes: ''
   });
 
@@ -35,7 +37,7 @@ export default function AdminDashboard({ admin, onLogout }) {
     try {
       setLoading(true);
       const [ordersRes, statsRes] = await Promise.all([
-        orderApi.getOrders({ status: statusFilter, search: searchQuery }),
+        orderApi.getOrders({ status: statusFilter, search: searchQuery, orderType: orderTypeFilter }),
         orderApi.getStats()
       ]);
 
@@ -54,7 +56,7 @@ export default function AdminDashboard({ admin, onLogout }) {
 
   useEffect(() => {
     fetchData();
-  }, [statusFilter]);
+  }, [statusFilter, orderTypeFilter]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -65,7 +67,6 @@ export default function AdminDashboard({ admin, onLogout }) {
     try {
       await orderApi.updateOrderStatus(id, newStatus);
       setOrders(prev => prev.map(o => (o._id === id || o.orderId === id) ? { ...o, status: newStatus } : o));
-      // Refresh stats
       const statsRes = await orderApi.getStats();
       if (statsRes && statsRes.data) setStats(statsRes.data);
     } catch (err) {
@@ -96,11 +97,12 @@ export default function AdminDashboard({ admin, onLogout }) {
           customerName: '',
           phone: '',
           eventDate: new Date().toISOString().split('T')[0],
-          eventTime: '18:00',
-          guestCount: '100',
+          eventTime: '13:00',
+          guestCount: '1 (Single Order)',
           dishes: '',
+          totalAmount: 0,
           address: '',
-          orderType: 'bulk',
+          orderType: 'single',
           notes: ''
         });
         const statsRes = await orderApi.getStats();
@@ -113,14 +115,15 @@ export default function AdminDashboard({ admin, onLogout }) {
 
   const handleExportCSV = () => {
     if (orders.length === 0) return alert('No orders to export.');
-    const headers = ['Order ID', 'Customer Name', 'Phone', 'Event Date', 'Event Time', 'Guest Count', 'Dishes', 'Address', 'Status', 'Received Date'];
+    const headers = ['Order ID', 'Type', 'Customer Name', 'Phone', 'Date', 'Time', 'Guests/Amount', 'Dishes', 'Address', 'Status', 'Received Date'];
     const rows = orders.map(o => [
       o.orderId || o._id,
+      o.orderType || 'single',
       `"${o.customerName}"`,
       o.phone,
       o.eventDate,
       o.eventTime,
-      o.guestCount,
+      o.orderType === 'bulk' ? `"${o.guestCount} Guests"` : `"₹${o.totalAmount || 0}"`,
       `"${o.dishes?.replace(/"/g, '""')}"`,
       `"${o.address?.replace(/"/g, '""')}"`,
       o.status,
@@ -137,48 +140,60 @@ export default function AdminDashboard({ admin, onLogout }) {
     document.body.removeChild(link);
   };
 
+  // Filtered orders based on current type tab
+  const displayedOrders = orders.filter(o => {
+    if (orderTypeFilter === 'bulk') return o.orderType === 'bulk';
+    if (orderTypeFilter === 'single') return o.orderType !== 'bulk';
+    return true;
+  });
+
+  const singleCount = orders.filter(o => o.orderType !== 'bulk').length;
+  const bulkCount = orders.filter(o => o.orderType === 'bulk').length;
+
   return (
-    <div className="min-h-screen bg-gray-100 p-4 sm:p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto space-y-6">
-        
-        {/* Top Header Card */}
-        <div className="bg-gradient-to-r from-royal-crimson via-royal-crimson-dark to-royal-crimson text-white p-6 sm:p-8 rounded-3xl shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-xl bg-royal-gold text-royal-charcoal flex items-center justify-center text-xl font-bold shadow">
-                🍛
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
-                Royal Biriyani Admin Dashboard
-              </h1>
+    <div className="min-h-screen bg-gray-50 text-gray-900 pb-16">
+      
+      {/* Top Navbar */}
+      <header className="bg-royal-charcoal text-white sticky top-0 z-30 shadow-md">
+        <div className="max-w-7xl mx-auto px-4 py-3 sm:py-4 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-royal-crimson flex items-center justify-center text-royal-gold shadow">
+              <ShieldCheck className="w-5 h-5" />
             </div>
-            <p className="text-amber-200 text-xs sm:text-sm font-medium">
-              Manage Bulk Catering Requests, Online Food Orders &amp; Live Restaurant Dispatch
-            </p>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-black/30 border border-white/15 text-xs text-yellow-100 font-semibold">
-              <Phone className="w-3.5 h-3.5 text-royal-gold" />
-              Admin WhatsApp: <strong className="text-white">{adminPhone}</strong>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="font-black text-lg sm:text-xl text-white leading-tight">
+                  Royal Biriyani Admin Dashboard
+                </h1>
+                <span className="text-[10px] font-black uppercase bg-royal-crimson text-white px-2 py-0.5 rounded-full">
+                  Live Dispatch
+                </span>
+              </div>
+              <p className="text-xs text-gray-400">
+                Manage Single Delivery Orders, Bulk Feast Catering &amp; Kitchen Inventory
+              </p>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
+          {/* Tab Navigation */}
+          <div className="flex items-center gap-2">
             <button
               onClick={() => setActiveTab('orders')}
-              className={`px-4 py-2.5 rounded-xl font-bold text-xs transition flex items-center gap-1.5 ${
+              className={`px-4 py-2 rounded-xl text-xs font-black transition flex items-center gap-1.5 ${
                 activeTab === 'orders'
-                  ? 'bg-royal-gold text-royal-charcoal shadow-md scale-105'
-                  : 'bg-white/15 text-white hover:bg-white/25'
+                  ? 'bg-royal-crimson text-white shadow-md'
+                  : 'bg-white/10 text-gray-300 hover:bg-white/20'
               }`}
             >
-              <ShoppingBag className="w-4 h-4" /> Orders Management
+              <ShoppingBag className="w-4 h-4" /> Live Orders
             </button>
 
             <button
               onClick={() => setActiveTab('menu')}
-              className={`px-4 py-2.5 rounded-xl font-bold text-xs transition flex items-center gap-1.5 ${
+              className={`px-4 py-2 rounded-xl text-xs font-black transition flex items-center gap-1.5 ${
                 activeTab === 'menu'
-                  ? 'bg-royal-gold text-royal-charcoal shadow-md scale-105'
-                  : 'bg-white/15 text-white hover:bg-white/25'
+                  ? 'bg-royal-gold text-royal-charcoal shadow-md'
+                  : 'bg-white/10 text-gray-300 hover:bg-white/20'
               }`}
             >
               <Utensils className="w-4 h-4" /> Menu Catalog
@@ -186,22 +201,86 @@ export default function AdminDashboard({ admin, onLogout }) {
 
             <button
               onClick={onLogout}
-              className="px-3.5 py-2.5 bg-red-950/60 hover:bg-red-950 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 border border-white/20"
+              className="p-2 sm:px-3 sm:py-2 bg-red-950/60 hover:bg-red-900 text-white rounded-xl text-xs font-bold transition flex items-center gap-1 border border-white/20"
               title="Logout from Admin"
             >
-              <LogOut className="w-3.5 h-3.5" /> Logout
+              <LogOut className="w-4 h-4" /> <span className="hidden sm:inline">Logout</span>
             </button>
           </div>
         </div>
+      </header>
 
+      {/* Main Content Container */}
+      <main className="max-w-7xl mx-auto px-4 py-6 sm:py-8">
+        
         {/* Tab 1: Orders Management */}
         {activeTab === 'orders' && (
           <div className="space-y-6">
+            
             {/* Stat Cards */}
             <StatCards stats={stats} orders={orders} />
 
-            {/* Actions Bar */}
-            <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+            {/* Order Category Filter Tabs: All vs Single vs Bulk */}
+            <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 sm:p-4 rounded-2xl border border-gray-200 shadow-xs">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-black text-gray-500 uppercase tracking-wider flex items-center gap-1">
+                  <Filter className="w-3.5 h-3.5 text-royal-crimson" /> Category:
+                </span>
+                
+                <button
+                  onClick={() => setOrderTypeFilter('all')}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition flex items-center gap-1.5 ${
+                    orderTypeFilter === 'all'
+                      ? 'bg-royal-crimson text-white shadow-xs'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  All Orders ({orders.length})
+                </button>
+
+                <button
+                  onClick={() => setOrderTypeFilter('single')}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition flex items-center gap-1.5 ${
+                    orderTypeFilter === 'single'
+                      ? 'bg-emerald-600 text-white shadow-xs'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  <Truck className="w-3.5 h-3.5" /> Single Orders ({singleCount})
+                </button>
+
+                <button
+                  onClick={() => setOrderTypeFilter('bulk')}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition flex items-center gap-1.5 ${
+                    orderTypeFilter === 'bulk'
+                      ? 'bg-amber-600 text-white shadow-xs'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  <PartyPopper className="w-3.5 h-3.5" /> Bulk Catering ({bulkCount})
+                </button>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setIsAddOrderOpen(true)}
+                  className="px-3.5 py-1.5 bg-royal-crimson hover:bg-royal-crimson-dark text-white rounded-xl text-xs font-black transition flex items-center gap-1 shadow-xs"
+                >
+                  <Plus className="w-4 h-4" /> Add Order
+                </button>
+
+                <button
+                  onClick={handleExportCSV}
+                  className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold transition flex items-center gap-1"
+                  title="Export to CSV"
+                >
+                  <Download className="w-3.5 h-3.5" /> Export
+                </button>
+              </div>
+            </div>
+
+            {/* Status Filters & Search Bar */}
+            <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
               
               {/* Status Filter Buttons */}
               <div className="flex flex-wrap gap-1.5">
@@ -209,9 +288,9 @@ export default function AdminDashboard({ admin, onLogout }) {
                   <button
                     key={st}
                     onClick={() => setStatusFilter(st)}
-                    className={`px-3.5 py-2 rounded-xl text-xs font-extrabold capitalize transition ${
+                    className={`px-3 py-1.5 rounded-xl text-xs font-black capitalize transition ${
                       statusFilter === st
-                        ? 'bg-royal-crimson text-white shadow-sm'
+                        ? 'bg-royal-crimson text-white shadow-xs'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   >
@@ -220,24 +299,24 @@ export default function AdminDashboard({ admin, onLogout }) {
                 ))}
               </div>
 
-              {/* Search + Actions */}
-              <div className="flex flex-wrap items-center gap-2">
-                <form onSubmit={handleSearchSubmit} className="flex gap-2">
+              {/* Search + Refresh */}
+              <div className="flex items-center gap-2">
+                <form onSubmit={handleSearchSubmit} className="flex gap-1.5">
                   <div className="relative">
                     <input
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Search name, phone, ID..."
-                      className="pl-8 pr-3 py-2 text-xs border border-gray-300 rounded-xl focus:ring-2 focus:ring-royal-crimson focus:outline-none w-48 sm:w-56"
+                      className="pl-8 pr-3 py-1.5 text-xs border border-gray-300 rounded-xl focus:ring-2 focus:ring-royal-crimson focus:outline-none w-44 sm:w-56"
                     />
-                    <Search className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-2.5" />
+                    <Search className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-2" />
                   </div>
                   <button
                     type="submit"
-                    className="px-3 py-2 bg-gray-800 text-white rounded-xl text-xs font-bold hover:bg-black transition"
+                    className="px-3 py-1.5 bg-gray-800 hover:bg-black text-white rounded-xl text-xs font-bold transition"
                   >
-                    Filter
+                    Search
                   </button>
                 </form>
 
@@ -248,37 +327,22 @@ export default function AdminDashboard({ admin, onLogout }) {
                 >
                   <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
                 </button>
-
-                <button
-                  onClick={handleExportCSV}
-                  className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1"
-                  title="Export to CSV"
-                >
-                  <Download className="w-3.5 h-3.5" /> Export CSV
-                </button>
-
-                <button
-                  onClick={() => setIsAddOrderOpen(true)}
-                  className="px-4 py-2 bg-royal-crimson hover:bg-royal-crimson-dark text-white rounded-xl text-xs font-extrabold transition flex items-center gap-1 shadow"
-                >
-                  <Plus className="w-4 h-4" /> Add Order
-                </button>
               </div>
 
             </div>
 
             {/* Orders List */}
             <div className="space-y-4">
-              {orders.length === 0 ? (
+              {displayedOrders.length === 0 ? (
                 <div className="bg-white rounded-3xl p-12 text-center border border-gray-200 text-gray-400 space-y-2">
                   <ShoppingBag className="w-16 h-16 mx-auto text-gray-300 mb-2" />
-                  <h3 className="text-lg font-bold text-gray-700">No Orders Found</h3>
+                  <h3 className="text-lg font-black text-gray-700">No Orders Found</h3>
                   <p className="text-xs max-w-sm mx-auto">
-                    There are no orders matching the status <strong>"{statusFilter}"</strong> or current search criteria.
+                    There are no orders matching status <strong>"{statusFilter}"</strong> or category <strong>"{orderTypeFilter}"</strong>.
                   </p>
                 </div>
               ) : (
-                orders.map((order) => (
+                displayedOrders.map((order) => (
                   <OrderCard
                     key={order._id || order.orderId}
                     order={order}
@@ -341,7 +405,23 @@ export default function AdminDashboard({ admin, onLogout }) {
 
                 <div className="grid grid-cols-3 gap-3">
                   <div>
-                    <label className="block text-[11px] font-bold text-gray-700 mb-1">Event Date</label>
+                    <label className="block text-[11px] font-bold text-gray-700 mb-1">Order Type</label>
+                    <select
+                      value={newOrder.orderType}
+                      onChange={(e) => setNewOrder({ 
+                        ...newOrder, 
+                        orderType: e.target.value,
+                        guestCount: e.target.value === 'bulk' ? '100' : '1 (Single Order)'
+                      })}
+                      className="w-full px-2.5 py-2 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-royal-crimson focus:outline-none"
+                    >
+                      <option value="single">Single / Delivery</option>
+                      <option value="takeaway">Takeaway / Pickup</option>
+                      <option value="bulk">Bulk Catering</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold text-gray-700 mb-1">Date</label>
                     <input
                       type="date"
                       required
@@ -351,68 +431,77 @@ export default function AdminDashboard({ admin, onLogout }) {
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-bold text-gray-700 mb-1">Event Time</label>
-                    <input
-                      type="time"
-                      required
-                      value={newOrder.eventTime}
-                      onChange={(e) => setNewOrder({ ...newOrder, eventTime: e.target.value })}
-                      className="w-full px-2.5 py-2 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-royal-crimson focus:outline-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-bold text-gray-700 mb-1">Guest Count</label>
-                    <select
-                      value={newOrder.guestCount}
-                      onChange={(e) => setNewOrder({ ...newOrder, guestCount: e.target.value })}
-                      className="w-full px-2 py-2 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-royal-crimson focus:outline-none bg-white"
-                    >
-                      <option value="50">50</option>
-                      <option value="100">100</option>
-                      <option value="250">250</option>
-                      <option value="500+">500+</option>
-                      <option value="1000+">1000+</option>
-                    </select>
+                    <label className="block text-[11px] font-bold text-gray-700 mb-1">
+                      {newOrder.orderType === 'bulk' ? 'Guests Count' : 'Total Amount (₹)'}
+                    </label>
+                    {newOrder.orderType === 'bulk' ? (
+                      <input
+                        type="text"
+                        value={newOrder.guestCount}
+                        onChange={(e) => setNewOrder({ ...newOrder, guestCount: e.target.value })}
+                        placeholder="e.g. 100"
+                        className="w-full px-2.5 py-2 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-royal-crimson focus:outline-none"
+                      />
+                    ) : (
+                      <input
+                        type="number"
+                        value={newOrder.totalAmount}
+                        onChange={(e) => setNewOrder({ ...newOrder, totalAmount: Number(e.target.value) })}
+                        placeholder="e.g. 240"
+                        className="w-full px-2.5 py-2 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-royal-crimson focus:outline-none"
+                      />
+                    )}
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-gray-700 mb-1">Dishes / Menu *</label>
+                  <label className="block text-[11px] font-bold text-gray-700 mb-1">Dishes / Order Items *</label>
                   <input
                     type="text"
                     required
                     value={newOrder.dishes}
                     onChange={(e) => setNewOrder({ ...newOrder, dishes: e.target.value })}
-                    placeholder="e.g. Mutton Biriyani, Chicken Fry, Gravy, Sweet"
+                    placeholder="e.g. Chicken Biriyani (x2), Chicken Fry (x1)"
                     className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-royal-crimson focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-gray-700 mb-1">Delivery Address *</label>
-                  <input
-                    type="text"
+                  <label className="block text-[11px] font-bold text-gray-700 mb-1">Delivery / Venue Address *</label>
+                  <textarea
                     required
+                    rows={2}
                     value={newOrder.address}
                     onChange={(e) => setNewOrder({ ...newOrder, address: e.target.value })}
-                    placeholder="Street, Landmark, Komarapalayam"
+                    placeholder="e.g. Salem Main Road, Komarapalayam"
                     className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-royal-crimson focus:outline-none"
                   />
                 </div>
 
-                <div className="pt-3 flex gap-2">
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-700 mb-1">Special Notes</label>
+                  <input
+                    type="text"
+                    value={newOrder.notes}
+                    onChange={(e) => setNewOrder({ ...newOrder, notes: e.target.value })}
+                    placeholder="Optional notes or instructions"
+                    className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-royal-crimson focus:outline-none"
+                  />
+                </div>
+
+                <div className="pt-2 flex justify-end gap-2">
                   <button
                     type="button"
                     onClick={() => setIsAddOrderOpen(false)}
-                    className="flex-1 py-2.5 bg-gray-100 text-gray-700 font-bold text-xs rounded-xl hover:bg-gray-200 transition"
+                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl text-xs font-bold hover:bg-gray-200"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 py-2.5 bg-royal-crimson text-white font-bold text-xs rounded-xl hover:bg-royal-crimson-dark transition shadow"
+                    className="px-5 py-2 bg-royal-crimson hover:bg-royal-crimson-dark text-white rounded-xl text-xs font-black shadow"
                   >
-                    Create &amp; Save Order
+                    Save &amp; Create Order
                   </button>
                 </div>
               </form>
@@ -420,7 +509,7 @@ export default function AdminDashboard({ admin, onLogout }) {
           </div>
         )}
 
-      </div>
+      </main>
     </div>
   );
 }

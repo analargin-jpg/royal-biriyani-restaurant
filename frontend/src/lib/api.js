@@ -107,6 +107,13 @@ export const orderApi = {
     if (params.status && params.status !== 'all') {
       merged = merged.filter(o => o.status === params.status);
     }
+    if (params.orderType && params.orderType !== 'all') {
+      if (params.orderType === 'bulk') {
+        merged = merged.filter(o => o.orderType === 'bulk');
+      } else if (params.orderType === 'single') {
+        merged = merged.filter(o => o.orderType !== 'bulk');
+      }
+    }
     if (params.search) {
       const s = params.search.toLowerCase();
       merged = merged.filter(o =>
