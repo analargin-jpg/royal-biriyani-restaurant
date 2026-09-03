@@ -318,6 +318,43 @@ exports.createOrder = async (req, res) => {
   }
 };
 
+// @desc    Update order details
+// @route   PUT /api/orders/:id
+exports.updateOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+    let order = null;
+
+    if (isDbReady()) {
+      if (id.match(/^[0-9a-fA-F]{24}$/)) {
+        order = await Order.findByIdAndUpdate(id, req.body, { new: true });
+      } else {
+        order = await Order.findOneAndUpdate({ orderId: Number(id) }, req.body, { new: true });
+      }
+    }
+
+    memoryOrders = loadFileOrders();
+    const idx = memoryOrders.findIndex(o => String(o.orderId) === id || o._id === id);
+    if (idx !== -1) {
+      memoryOrders[idx] = { ...memoryOrders[idx], ...req.body, updatedAt: new Date().toISOString() };
+      if (!order) order = memoryOrders[idx];
+      saveFileOrders(memoryOrders);
+    }
+
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+
+    return res.json({
+      success: true,
+      message: 'Order updated successfully',
+      data: order
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // @desc    Update order status
 // @route   PATCH /api/orders/:id/status
 exports.updateOrderStatus = async (req, res) => {
