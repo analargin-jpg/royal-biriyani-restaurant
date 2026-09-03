@@ -26,11 +26,12 @@ export default function FloatingWhatsApp() {
         href={`https://wa.me/${adminPhone}?text=${defaultMsg}`}
         target="_blank"
         rel="noopener noreferrer"
-        className="w-12 h-12 sm:w-13 sm:h-13 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition duration-200 border-2 border-white animate-pulse"
+        className="relative w-12 h-12 sm:w-13 sm:h-13 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition duration-200 border-2 border-white"
         title="Chat on WhatsApp (6384945599)"
         aria-label="Chat on WhatsApp"
       >
-        <MessageCircle className="w-6 h-6 sm:w-7 sm:h-7" />
+        <span className="animate-ripple"></span>
+        <MessageCircle className="w-6 h-6 sm:w-7 sm:h-7 relative z-10" />
       </a>
     </div>
   );

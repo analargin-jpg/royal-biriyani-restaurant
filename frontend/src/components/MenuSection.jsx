@@ -265,7 +265,7 @@ export default function MenuSection({ cart = [], onAddToCart, onUpdateQuantity }
               className={`bg-white rounded-3xl overflow-hidden border transition-all duration-300 flex flex-col justify-between group ${
                 isOut
                   ? 'border-gray-200 opacity-60'
-                  : 'border-gray-200 hover:border-amber-300 shadow-sm hover:shadow-xl hover:-translate-y-1'
+                  : 'border-gray-200 hover:border-amber-400 shadow-sm hover:shadow-2xl hover:-translate-y-1.5'
               }`}
             >
               {/* Dish Photography Header */}
@@ -275,7 +275,7 @@ export default function MenuSection({ cart = [], onAddToCart, onUpdateQuantity }
                   src={displayImg}
                   alt={item.name}
                   loading="lazy"
-                  className="w-full h-full object-cover object-center group-hover:scale-108 transition-transform duration-500"
+                  className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-700 ease-out"
                   onError={(e) => {
                     e.target.onerror = null;
                     e.target.src = 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?q=80&w=800&auto=format&fit=crop';
@@ -299,8 +299,8 @@ export default function MenuSection({ cart = [], onAddToCart, onUpdateQuantity }
                   </span>
 
                   {item.isPopular && (
-                    <span className="bg-royal-crimson text-white text-[10px] font-black px-2 py-0.5 rounded-lg shadow flex items-center gap-1">
-                      <Flame className="w-3 h-3 text-royal-gold" /> Bestseller
+                    <span className="bg-royal-crimson text-white text-[10px] font-black px-2 py-0.5 rounded-lg shadow flex items-center gap-1 animate-pulse">
+                      <Flame className="w-3 h-3 text-royal-gold animate-bounce-gentle" /> Bestseller
                     </span>
                   )}
                 </div>

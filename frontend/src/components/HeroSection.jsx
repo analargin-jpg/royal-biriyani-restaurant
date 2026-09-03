@@ -15,27 +15,27 @@ export default function HeroSection({ onOpenBulk, onScrollMenu }) {
           backgroundPosition: `0 0, 14px 14px`
         }}
       />
-      <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-royal-gold/20 blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-24 -left-24 w-96 h-96 rounded-full bg-black/40 blur-3xl pointer-events-none" />
+      <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-royal-gold/20 blur-3xl pointer-events-none animate-float-slow" />
+      <div className="absolute -bottom-24 -left-24 w-96 h-96 rounded-full bg-black/40 blur-3xl pointer-events-none animate-float" />
 
       <div className="relative max-w-6xl mx-auto px-4 py-12 sm:py-20 md:py-24 flex flex-col items-center text-center">
         
         {/* Top Floating Pill */}
-        <div className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-royal-gold/40 text-royal-gold text-[11px] sm:text-xs font-black tracking-wide uppercase mb-5 shadow-inner">
-          <Sparkles className="w-3.5 h-3.5 text-royal-gold" />
+        <div className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-royal-gold/40 text-royal-gold text-[11px] sm:text-xs font-black tracking-wide uppercase mb-5 shadow-inner animate-float">
+          <Sparkles className="w-3.5 h-3.5 text-royal-gold animate-spin-slow" />
           Komarapalayam&apos;s Signature Biriyani &amp; Fast Food
         </div>
 
         {/* Main Headline */}
         <h1 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight max-w-4xl leading-tight mb-3 sm:mb-4">
-          Royal Biriyani <span className="text-royal-gold">&amp; Fast Food</span>
+          Royal Biriyani <span className="text-royal-gold drop-shadow-md">&amp; Fast Food</span>
         </h1>
 
         {/* Subtitle */}
         <p className="text-base sm:text-2xl font-bold text-amber-200 mb-6 sm:mb-8 max-w-2xl flex items-center justify-center gap-2">
-          <Flame className="w-4 h-4 sm:w-5 sm:h-5 text-royal-gold" />
+          <Flame className="w-4 h-4 sm:w-5 sm:h-5 text-royal-gold animate-bounce-gentle" />
           Taste The Royalty in Every Grain!
-          <Flame className="w-4 h-4 sm:w-5 sm:h-5 text-royal-gold" />
+          <Flame className="w-4 h-4 sm:w-5 sm:h-5 text-royal-gold animate-bounce-gentle" />
         </p>
 
         <p className="text-gray-200 text-xs sm:text-sm md:text-base max-w-2xl mb-8 sm:mb-10 leading-relaxed font-normal">
@@ -46,7 +46,7 @@ export default function HeroSection({ onOpenBulk, onScrollMenu }) {
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto mb-10 sm:mb-12">
           <button
             onClick={onScrollMenu}
-            className="w-full sm:w-auto px-7 py-3.5 sm:py-4 bg-white text-royal-crimson hover:bg-gray-100 font-black text-sm sm:text-base rounded-2xl shadow-xl hover:shadow-2xl transition transform hover:-translate-y-0.5 flex items-center justify-center gap-2 active:scale-95"
+            className="w-full sm:w-auto px-7 py-3.5 sm:py-4 bg-white text-royal-crimson hover:bg-gray-100 font-black text-sm sm:text-base rounded-2xl shadow-xl hover:shadow-2xl transition transform hover:-translate-y-0.5 flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
           >
             <Utensils className="w-4 h-4 sm:w-5 sm:h-5 text-royal-crimson" />
             Order Food Online
@@ -54,7 +54,7 @@ export default function HeroSection({ onOpenBulk, onScrollMenu }) {
           
           <button
             onClick={onOpenBulk}
-            className="w-full sm:w-auto px-7 py-3.5 sm:py-4 bg-gradient-to-r from-royal-gold to-yellow-500 text-royal-charcoal hover:brightness-105 font-black text-sm sm:text-base rounded-2xl shadow-xl hover:shadow-2xl transition transform hover:-translate-y-0.5 flex items-center justify-center gap-2 border border-yellow-300 active:scale-95"
+            className="w-full sm:w-auto px-7 py-3.5 sm:py-4 bg-gradient-to-r from-royal-gold via-yellow-400 to-royal-gold text-royal-charcoal hover:brightness-105 font-black text-sm sm:text-base rounded-2xl shadow-xl hover:shadow-2xl transition transform hover:-translate-y-0.5 flex items-center justify-center gap-2 border border-yellow-300 active:scale-95 animate-shimmer animate-pulse-glow cursor-pointer"
           >
             <PartyPopper className="w-4 h-4 sm:w-5 sm:h-5 text-royal-charcoal" />
             Book Bulk Catering (50 - 2000+)
