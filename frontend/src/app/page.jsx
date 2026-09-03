@@ -188,7 +188,7 @@ export default function HomePage() {
 
       {/* Footer */}
       <footer className="bg-royal-charcoal text-white pt-14 pb-12 sm:pb-8 border-t-4 border-royal-gold">
-        <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 pb-10 border-b border-gray-800">
+        <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 sm:gap-10 pb-10 border-b border-gray-800">
           
           {/* Col 1 */}
           <div className="space-y-3">
@@ -223,24 +223,10 @@ export default function HomePage() {
             <h4 className="font-bold text-xs sm:text-sm text-royal-gold uppercase tracking-wider">Contact &amp; Timings</h4>
             <div className="text-xs space-y-2 text-gray-300">
               <p className="flex items-center gap-1.5"><Utensils className="w-3.5 h-3.5 text-royal-gold" /> <strong>Restaurant:</strong> <a href="tel:+917418525405" className="hover:text-white">+91 74185 25405</a></p>
-              <p className="flex items-center gap-1.5"><Phone className="w-3.5 h-3.5 text-emerald-400" /> <strong>Admin WhatsApp:</strong> 6384945599</p>
+              <p className="flex items-center gap-1.5"><Phone className="w-3.5 h-3.5 text-emerald-400" /> <strong>Customer Support:</strong> 6384945599</p>
               <p className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-amber-300" /> <strong>Hours:</strong> 11:00 AM – 11:00 PM</p>
               <p className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 text-red-400" /> <strong>Location:</strong> Near TMMB Bank, Komarapalayam</p>
             </div>
-          </div>
-
-          {/* Col 4 */}
-          <div className="space-y-3">
-            <h4 className="font-bold text-xs sm:text-sm text-royal-gold uppercase tracking-wider">Admin Portal</h4>
-            <p className="text-xs text-gray-400 leading-relaxed">
-              Restaurant staff can manage live orders and menu inventory via the secure admin dashboard.
-            </p>
-            <Link
-              href="/admin"
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-royal-crimson hover:bg-royal-crimson-dark text-white rounded-xl text-xs font-bold transition shadow"
-            >
-              <ShieldCheck className="w-4 h-4 text-royal-gold" /> Open Admin Portal
-            </Link>
           </div>
 
         </div>

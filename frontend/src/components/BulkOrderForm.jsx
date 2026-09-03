@@ -375,7 +375,7 @@ export default function BulkOrderForm({ onOrderSubmitted, currentUser = null }) 
                     )}
                   </button>
                   <p className="text-center text-xs text-gray-500">
-                    💡 Directly notifies kitchen &amp; admin (+91 74185 25405 / 6384945599) via WhatsApp &amp; Database.
+                    Directly transmits booking request to our kitchen &amp; catering team (+91 74185 25405) via WhatsApp &amp; Database.
                   </p>
                 </form>
               </>

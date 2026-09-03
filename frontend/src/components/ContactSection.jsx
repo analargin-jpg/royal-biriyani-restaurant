@@ -4,7 +4,7 @@ import React from 'react';
 import { MapPin, Phone, MessageCircle, Clock, Utensils, CheckCircle2, Navigation } from 'lucide-react';
 
 export default function ContactSection() {
-  const adminPhone = '6384945599';
+  const supportPhone = '6384945599';
   const restaurantPhone = '+917418525405';
 
   return (
@@ -94,19 +94,19 @@ export default function ContactSection() {
             </div>
           </div>
 
-          {/* Admin WhatsApp */}
+          {/* Customer Support WhatsApp */}
           <div className="p-6 bg-white rounded-2xl shadow-sm border border-gray-200 hover:border-royal-gold transition">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Admin WhatsApp &amp; Bulk Support</p>
-                <h4 className="text-xl font-extrabold text-gray-900 mt-0.5">{adminPhone}</h4>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Customer Support &amp; Bulk Orders</p>
+                <h4 className="text-xl font-extrabold text-gray-900 mt-0.5">{supportPhone}</h4>
               </div>
               <a
-                href={`https://wa.me/${adminPhone}?text=${encodeURIComponent('Hello Royal Biriyani Admin, I have an inquiry!')}`}
+                href={`https://wa.me/${supportPhone}?text=${encodeURIComponent('Hello Royal Biriyani Support, I have an inquiry!')}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-3 rounded-xl bg-[#25D366] text-white hover:brightness-105 transition shadow"
-                aria-label="WhatsApp Admin"
+                aria-label="WhatsApp Customer Support"
               >
                 <MessageCircle className="w-5 h-5" />
               </a>

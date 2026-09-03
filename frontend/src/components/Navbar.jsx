@@ -56,11 +56,8 @@ export default function Navbar({
             </div>
             <div className="flex items-center gap-3 sm:gap-4 font-bold flex-shrink-0">
               <a href="tel:+917418525405" className="hover:text-royal-gold transition flex items-center gap-1">
-                <Phone className="w-3 h-3 text-royal-gold" /> <span className="hidden sm:inline">+91 74185 25405</span>
+                <Phone className="w-3 h-3 text-royal-gold" /> <span>+91 74185 25405</span>
               </a>
-              <Link href="/admin" className="inline-flex items-center gap-1 text-amber-200 hover:text-white transition">
-                <ShieldCheck className="w-3 h-3 text-royal-gold" /> <span className="hidden md:inline">Admin</span>
-              </Link>
             </div>
           </div>
         </div>
@@ -316,21 +313,13 @@ export default function Navbar({
             </div>
 
             {/* Drawer Footer Actions */}
-            <div className="p-4 border-t border-gray-200 space-y-2.5 bg-gray-50">
+            <div className="p-4 border-t border-gray-200 bg-gray-50">
               <a
                 href="tel:+917418525405"
-                className="w-full py-2.5 bg-royal-crimson text-white text-xs font-black rounded-xl shadow flex items-center justify-center gap-2"
+                className="w-full py-3 bg-royal-crimson hover:bg-royal-crimson-dark text-white text-xs font-black rounded-xl shadow flex items-center justify-center gap-2 transition active:scale-98"
               >
                 <Phone className="w-4 h-4 text-royal-gold" /> Call Restaurant (+91 74185 25405)
               </a>
-
-              <Link
-                href="/admin"
-                onClick={() => setMobileMenuOpen(false)}
-                className="w-full py-2 bg-white border border-gray-300 text-gray-700 text-center font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-xs"
-              >
-                <ShieldCheck className="w-3.5 h-3.5 text-royal-gold" /> Admin Portal Login
-              </Link>
             </div>
 
           </div>
