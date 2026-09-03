@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Royal Biriyani & Fast Food - Fullstack Next.js, Node.js, Express & MongoDB Application",
   "scripts": {
+    "predev": "npm run clean:ports",
     "dev": "concurrently -n \"BACKEND,FRONTEND\" -c \"bgBlue.bold,bgMagenta.bold\" \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:backend": "cd backend && npm run dev",
     "dev:frontend": "cd frontend && npm run dev",
@@ -10,7 +11,7 @@
     "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
     "seed": "cd backend && npm run seed",
     "build": "cd frontend && npm run build",
-    "clean:ports": "powershell -Command \"Get-NetTCPConnection -LocalPort 3000, 5000 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }\""
+    "clean:ports": "powershell -Command \"try { Get-NetTCPConnection -LocalPort 3000, 5000 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue } } catch {}; exit 0\""
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
