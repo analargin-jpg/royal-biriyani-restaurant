@@ -295,6 +295,24 @@ export default function BulkOrderForm({ onOrderSubmitted, currentUser = null }) 
                         <option value="500">500+ Guests (Marriage Reception)</option>
                         <option value="1000">1000+ Guests (Mega Event)</option>
                       </select>
+
+                      {/* Quick Pill Buttons with scale pop */}
+                      <div className="flex items-center gap-1.5 mt-2 overflow-x-auto no-scrollbar py-0.5">
+                        {['50', '100', '250', '500', '1000+'].map((count) => (
+                          <button
+                            key={count}
+                            type="button"
+                            onClick={() => setFormData(prev => ({ ...prev, guestCount: count }))}
+                            className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition-all duration-200 active:scale-90 ${
+                              formData.guestCount === count
+                                ? 'bg-royal-crimson text-white shadow-xs scale-105'
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            }`}
+                          >
+                            {count}
+                          </button>
+                        ))}
+                      </div>
                     </div>
 
                     <div>
@@ -363,7 +381,7 @@ export default function BulkOrderForm({ onOrderSubmitted, currentUser = null }) 
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full py-4 bg-gradient-to-r from-royal-crimson to-royal-crimson-dark text-white font-extrabold text-base rounded-2xl shadow-xl hover:shadow-2xl hover:brightness-110 transition flex items-center justify-center gap-2 transform active:scale-98 disabled:opacity-50"
+                    className="w-full py-4 bg-gradient-to-r from-royal-crimson via-royal-crimson-dark to-royal-crimson text-white font-extrabold text-base rounded-2xl shadow-xl hover:shadow-2xl hover:brightness-110 transition flex items-center justify-center gap-2 transform active:scale-98 disabled:opacity-50 animate-shimmer border border-amber-400/30"
                   >
                     {loading ? (
                       'Submitting Request...'

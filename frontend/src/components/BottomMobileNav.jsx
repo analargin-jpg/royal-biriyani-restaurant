@@ -58,10 +58,10 @@ export default function BottomMobileNav({ cartCount = 0, onOpenCart, onOpenTrack
         {/* 5. Cart Button with Counter */}
         <button
           onClick={onOpenCart}
-          className="flex flex-col items-center gap-1 text-royal-crimson hover:text-royal-crimson-dark transition active:scale-95 py-1 px-2 relative"
+          className="flex flex-col items-center gap-1 text-royal-crimson hover:text-royal-crimson-dark transition active:scale-90 py-1 px-2 relative"
         >
           <div className="relative">
-            <ShoppingBag className="w-5 h-5" />
+            <ShoppingBag className={`w-5 h-5 ${cartCount > 0 ? 'animate-wiggle text-royal-crimson' : ''}`} />
             {cartCount > 0 && (
               <span className="absolute -top-1.5 -right-2 bg-royal-crimson text-white text-[9px] font-black rounded-full h-4 min-w-4 px-1 flex items-center justify-center border border-white shadow animate-bounce">
                 {cartCount}
