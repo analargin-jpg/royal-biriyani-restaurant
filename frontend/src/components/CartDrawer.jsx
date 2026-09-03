@@ -87,6 +87,11 @@ export default function CartDrawer({
       if (onOrderPlaced) {
         onOrderPlaced(savedOrder);
       }
+      if (typeof window !== 'undefined') {
+        try {
+          window.dispatchEvent(new CustomEvent('royal_order_placed', { detail: savedOrder }));
+        } catch (e) {}
+      }
       onClearCart();
 
       // 2. Prepare pre-filled WhatsApp message to restaurant (+91 74185 25405)

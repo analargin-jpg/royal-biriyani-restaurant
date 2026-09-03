@@ -214,12 +214,17 @@ exports.createOrder = async (req, res) => {
       notes
     } = req.body;
 
-    if (!customerName || !phone || !address) {
+    if (!customerName || !phone) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide customer name, phone number, and address.'
+        message: 'Please provide customer name and phone number.'
       });
     }
+
+    const normalizedOrderType = (orderType === 'bulk') ? 'bulk' : (orderType === 'takeaway' ? 'takeaway' : 'single');
+    const finalAddress = (address && String(address).trim())
+      ? String(address).trim()
+      : (normalizedOrderType === 'takeaway' ? 'Takeaway / Self Pickup' : 'Komarapalayam (Address on phone)');
 
     let finalDishes = (dishes && String(dishes).trim()) ? String(dishes).trim() : '';
     if (!finalDishes && items && Array.isArray(items) && items.length > 0) {
@@ -266,14 +271,14 @@ exports.createOrder = async (req, res) => {
       orderId: nextOrderId,
       customerName: customerName.trim(),
       phone: phone.trim(),
-      orderType: orderType || 'single',
+      orderType: normalizedOrderType,
       eventDate: eventDate || new Date().toISOString().split('T')[0],
       eventTime: eventTime || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      guestCount: guestCount || (orderType === 'bulk' ? '50+' : '1 (Single Order)'),
+      guestCount: guestCount || (normalizedOrderType === 'bulk' ? '50+' : '1 (Single Order)'),
       dishes: finalDishes,
       items: formattedItems,
       totalAmount: finalTotal,
-      address: address.trim(),
+      address: finalAddress,
       notes: notes || '',
       status: 'pending'
     };

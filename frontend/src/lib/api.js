@@ -172,6 +172,12 @@ export const orderApi = {
     const updated = [saved, ...locals.filter(o => (o.orderId || o._id) !== (saved.orderId || saved._id))];
     saveLocalOrders(updated);
 
+    if (typeof window !== 'undefined') {
+      try {
+        window.dispatchEvent(new CustomEvent('royal_order_placed', { detail: saved }));
+      } catch (e) {}
+    }
+
     return { success: true, data: saved };
   },
 

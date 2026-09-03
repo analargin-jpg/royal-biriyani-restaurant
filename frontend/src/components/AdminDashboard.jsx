@@ -33,11 +33,11 @@ export default function AdminDashboard({ admin, onLogout }) {
 
   const adminPhone = admin?.phone || '6384945599';
 
-  const fetchData = async () => {
+  const fetchData = async (showLoadingSpinner = true) => {
     try {
-      setLoading(true);
+      if (showLoadingSpinner) setLoading(true);
       const [ordersRes, statsRes] = await Promise.all([
-        orderApi.getOrders({ status: statusFilter, search: searchQuery, orderType: orderTypeFilter }),
+        orderApi.getOrders({ status: statusFilter, search: searchQuery }),
         orderApi.getStats()
       ]);
 
@@ -50,13 +50,29 @@ export default function AdminDashboard({ admin, onLogout }) {
     } catch (err) {
       console.warn('Orders load note:', err.message);
     } finally {
-      setLoading(false);
+      if (showLoadingSpinner) setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchData();
-  }, [statusFilter, orderTypeFilter]);
+
+    // Real-time synchronization: listen for events and poll every 4 seconds
+    const handleOrderEvent = () => fetchData(false);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('royal_order_placed', handleOrderEvent);
+      window.addEventListener('storage', handleOrderEvent);
+    }
+
+    const interval = setInterval(() => fetchData(false), 4000);
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('royal_order_placed', handleOrderEvent);
+        window.removeEventListener('storage', handleOrderEvent);
+      }
+      clearInterval(interval);
+    };
+  }, [statusFilter]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
