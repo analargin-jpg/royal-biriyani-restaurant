@@ -1,5 +1,48 @@
 [
   {
+    "_id": "ord_1788484597807",
+    "orderId": 1005,
+    "customerName": "ANAL ARGIN E",
+    "phone": "6384945599",
+    "orderType": "single",
+    "eventDate": "2026-09-04",
+    "eventTime": "06:46",
+    "guestCount": "1 (Single Order)",
+    "dishes": "Chicken Fry (x2), Chicken Leg Piece (x2), Kadai Fry (x2), Liver Fry (x1)",
+    "items": [
+      {
+        "name": "Chicken Fry",
+        "price": 180,
+        "quantity": 2,
+        "subtotal": 360
+      },
+      {
+        "name": "Chicken Leg Piece",
+        "price": 160,
+        "quantity": 2,
+        "subtotal": 320
+      },
+      {
+        "name": "Kadai Fry",
+        "price": 200,
+        "quantity": 2,
+        "subtotal": 400
+      },
+      {
+        "name": "Liver Fry",
+        "price": 150,
+        "quantity": 1,
+        "subtotal": 150
+      }
+    ],
+    "totalAmount": 1230,
+    "address": "GH",
+    "notes": "",
+    "status": "pending",
+    "createdAt": "2026-09-04T01:16:37.807Z",
+    "updatedAt": "2026-09-04T01:16:37.807Z"
+  },
+  {
     "_id": "ord_1788430162777",
     "orderId": 1004,
     "customerName": "ANAL ARGIN E",
