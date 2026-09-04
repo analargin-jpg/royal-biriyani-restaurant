@@ -52,9 +52,9 @@ export default function CartDrawer({
       const dishesSummary = cart.map(i => `${i.name} (x${i.quantity})`).join(', ');
 
       const orderPayload = {
-        customerName,
-        phone,
-        orderType,
+        customerName: customerName.trim(),
+        phone: phone.trim(),
+        orderType: orderType === 'takeaway' ? 'takeaway' : 'single',
         dishes: dishesSummary,
         items: cart.map(i => ({
           name: i.name,
@@ -63,8 +63,8 @@ export default function CartDrawer({
           subtotal: i.price * i.quantity
         })),
         totalAmount,
-        address: orderType === 'takeaway' ? 'Takeaway / Self Pickup' : address,
-        notes,
+        address: orderType === 'takeaway' ? 'Takeaway / Self Pickup' : (address && address.trim() ? address.trim() : 'Komarapalayam (Address on call)'),
+        notes: notes || '',
         eventDate: new Date().toISOString().split('T')[0],
         eventTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };

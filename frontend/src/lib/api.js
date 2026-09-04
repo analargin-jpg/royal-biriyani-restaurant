@@ -1,6 +1,12 @@
 import axios from 'axios';
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const getBaseUrl = () => {
+  if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
+  if (typeof window !== 'undefined') return '/api';
+  return 'http://127.0.0.1:5000/api';
+};
+
+const BASE_URL = getBaseUrl();
 
 const apiClient = axios.create({
   baseURL: BASE_URL,
@@ -47,6 +53,12 @@ export const menuApi = {
       const res = await apiClient.get('/menu', { params });
       return res.data;
     } catch (error) {
+      if (typeof window !== 'undefined') {
+        try {
+          const res127 = await axios.get('http://127.0.0.1:5000/api/menu', { params, timeout: 4000 });
+          return res127.data;
+        } catch (e2) {}
+      }
       console.warn('Menu API fetch error, fallback:', error.message);
       return { success: true, data: [] };
     }
@@ -78,7 +90,23 @@ export const orderApi = {
         apiOrders = res.data.data;
       }
     } catch (error) {
-      console.warn('Orders API network fallback:', error.message);
+      if (typeof window !== 'undefined') {
+        try {
+          const res127 = await axios.get('http://127.0.0.1:5000/api/orders', { params, timeout: 4000 });
+          if (res127.data && Array.isArray(res127.data.data)) {
+            apiOrders = res127.data.data;
+          }
+        } catch (e2) {
+          try {
+            const resLocal = await axios.get('http://localhost:5000/api/orders', { params, timeout: 4000 });
+            if (resLocal.data && Array.isArray(resLocal.data.data)) {
+              apiOrders = resLocal.data.data;
+            }
+          } catch (e3) {
+            console.warn('Orders API network fallback to local:', e3.message);
+          }
+        }
+      }
     }
 
     // Merge with client localStorage orders
@@ -137,6 +165,12 @@ export const orderApi = {
       const res = await apiClient.get(`/orders/${id}`);
       return res.data;
     } catch (e) {
+      if (typeof window !== 'undefined') {
+        try {
+          const res127 = await axios.get(`http://127.0.0.1:5000/api/orders/${id}`, { timeout: 4000 });
+          return res127.data;
+        } catch (e2) {}
+      }
       const local = getLocalOrders().find(o => String(o.orderId) === id || o._id === id);
       if (local) return { success: true, data: local };
       throw e;
@@ -151,7 +185,23 @@ export const orderApi = {
         saved = res.data.data;
       }
     } catch (error) {
-      console.warn('Backend offline, saving order locally:', error.message);
+      if (typeof window !== 'undefined') {
+        try {
+          const res127 = await axios.post('http://127.0.0.1:5000/api/orders', data, { timeout: 4000 });
+          if (res127.data && res127.data.data) {
+            saved = res127.data.data;
+          }
+        } catch (err2) {
+          try {
+            const resLocal = await axios.post('http://localhost:5000/api/orders', data, { timeout: 4000 });
+            if (resLocal.data && resLocal.data.data) {
+              saved = resLocal.data.data;
+            }
+          } catch (err3) {
+            console.warn('Backend offline, saving order locally:', err3.message);
+          }
+        }
+      }
     }
 
     if (!saved) {
@@ -185,6 +235,11 @@ export const orderApi = {
     try {
       await apiClient.patch(`/orders/${id}/status`, { status });
     } catch (e) {
+      if (typeof window !== 'undefined') {
+        try {
+          await axios.patch(`http://127.0.0.1:5000/api/orders/${id}/status`, { status }, { timeout: 4000 });
+        } catch (e2) {}
+      }
       console.warn('Backend offline on status update:', e.message);
     }
 
@@ -205,6 +260,11 @@ export const orderApi = {
     try {
       await apiClient.put(`/orders/${id}`, data);
     } catch (e) {
+      if (typeof window !== 'undefined') {
+        try {
+          await axios.put(`http://127.0.0.1:5000/api/orders/${id}`, data, { timeout: 4000 });
+        } catch (e2) {}
+      }
       console.warn('Backend offline on update:', e.message);
     }
 
@@ -224,6 +284,11 @@ export const orderApi = {
     try {
       await apiClient.delete(`/orders/${id}`);
     } catch (e) {
+      if (typeof window !== 'undefined') {
+        try {
+          await axios.delete(`http://127.0.0.1:5000/api/orders/${id}`, { timeout: 4000 });
+        } catch (e2) {}
+      }
       console.warn('Backend offline on delete:', e.message);
     }
 
@@ -241,6 +306,14 @@ export const orderApi = {
         return res.data;
       }
     } catch (e) {
+      if (typeof window !== 'undefined') {
+        try {
+          const res127 = await axios.get('http://127.0.0.1:5000/api/orders/stats', { timeout: 4000 });
+          if (res127.data && res127.data.data) {
+            return res127.data;
+          }
+        } catch (e2) {}
+      }
       console.warn('Stats API error, computing from local store');
     }
 
